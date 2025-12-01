@@ -400,6 +400,7 @@
             if (!profilePicPath.startsWith('profile/')) {
               profilePicPath = 'profile/' + profilePicPath;
             }
+            profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
           }
           document.getElementById('profilePic').src = profilePicPath;
         }
@@ -552,14 +553,14 @@
         // Get image URL (service images are in frontend/admin/service/)
         let imageUrl = booking.image || 'service/default.jpg';
         if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-          imageUrl = `http://127.0.0.1:8000/${imageUrl}`;
+          imageUrl = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageUrl}`;
         }
 
         bookingsHTML += `
           <div class="col-md-6 col-lg-4">
             <div class="booking-card">
               <div class="position-relative">
-                <img src="${imageUrl}" class="booking-image" alt="${booking.service_name}" onerror="this.src='http://127.0.0.1:8000/service/default.jpg'">
+                <img src="${imageUrl}" class="booking-image" alt="${booking.service_name}" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/service/default.jpg'">
                 <span class="badge status-badge ${badgeClass}">${booking.status}</span>
               </div>
               <div class="booking-details">
@@ -764,12 +765,12 @@
       
       let imageUrl = booking.image || 'service/default.jpg';
       if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-        imageUrl = `http://127.0.0.1:8000/${imageUrl}`;
+        imageUrl = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageUrl}`;
       }
 
       content.innerHTML = `
         <div class="text-center mb-3">
-          <img src="${imageUrl}" alt="${booking.service_name}" class="img-fluid rounded mb-3" style="max-height: 200px;" onerror="this.src='http://127.0.0.1:8000/service/default.jpg'">
+          <img src="${imageUrl}" alt="${booking.service_name}" class="img-fluid rounded mb-3" style="max-height: 200px;" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/service/default.jpg'">
           <h4>${booking.service_name}</h4>
           <div class="d-inline-block">
             <span class="badge ${badgeClass}">${booking.status}</span>

@@ -239,6 +239,9 @@
                     if (!profilePicPath.startsWith('profile/')) {
                         profilePicPath = 'profile/' + profilePicPath;
                     }
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
+                    }
                     document.getElementById('profilePic').src = profilePicPath;
                 } else {
                     console.error('Failed to load user info:', data.message || 'Unknown error');

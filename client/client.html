@@ -494,14 +494,14 @@
             let imageSrc = service.image || 'service/default.jpg';
             if (imageSrc && !imageSrc.startsWith('http')) {
               // If image path doesn't start with http, prepend backend URL
-              imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+              imageSrc = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageSrc}`;
             }
             
             servicesHTML += `
               <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="${delay}">
                 <div class="card service-card">
                   <span class="badge bg-primary service-badge">${service.category}</span>
-                  <img src="${imageSrc}" class="card-img-top service-image" alt="${service.name}" onerror="this.src='http://127.0.0.1:8000/service/default.jpg'">
+                  <img src="${imageSrc}" class="card-img-top service-image" alt="${service.name}" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/service/default.jpg'">
                   <div class="card-body text-center p-4">
                     <h5 class="card-title">${service.name}</h5>
                     <p class="card-text text-muted mb-2">${service.description}</p>

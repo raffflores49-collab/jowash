@@ -460,6 +460,9 @@
                     if (!profilePicPath.startsWith('profile/')) {
                         profilePicPath = 'profile/' + profilePicPath;
                     }
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
+                    }
                     document.getElementById('profilePic').src = profilePicPath;
                 } else {
                     if (response && (response.status === 401 || response.status === 403)) {

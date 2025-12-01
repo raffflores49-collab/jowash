@@ -1,5 +1,5 @@
 // API Utility Functions
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_BASE_URL = 'https://jowashlaravel.muccsbblock1.com/jowash-backend/api';
 
 // Get token from localStorage
 function getAuthToken() {

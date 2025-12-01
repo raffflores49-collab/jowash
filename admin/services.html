@@ -494,6 +494,9 @@
                     if (!profilePicPath.startsWith('profile/') && !profilePicPath.startsWith('http')) {
                         profilePicPath = 'profile/' + profilePicPath;
                     }
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
+                    }
                     if (document.getElementById('profilePic')) {
                         document.getElementById('profilePic').src = profilePicPath;
                     }
@@ -589,7 +592,7 @@
                 let imageSrc = service.image || 'service/default.jpg';
                 if (imageSrc && !imageSrc.startsWith('http')) {
                     // If image path doesn't start with http, prepend backend URL
-                    imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+                    imageSrc = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageSrc}`;
                 }
                 const price = parseFloat(service.price).toFixed(2);
 
@@ -812,7 +815,7 @@
                     if (service.image) {
                         let imageSrc = service.image;
                         if (!imageSrc.startsWith('http')) {
-                            imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+                            imageSrc = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageSrc}`;
                         }
                         currentImagePreview.innerHTML = `<img src="${imageSrc}" alt="${service.name}" onerror="this.parentElement.innerHTML='<span class=\\'text-muted\\'>No image</span>'">`;
                     } else {
