@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
     <title>Verify Activation Code</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.1.0/esm/ionicons.min.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/api.js"></script>
     <style>
         * {
             margin: 0;
@@ -272,8 +274,6 @@
     </div>
 
     <script>
-        // API Base URL
-        const API_BASE_URL = 'https://jowashlaravel.muccsbblock1.com/jowash-backend/api';
 
         // Load the road animation
         document.addEventListener('DOMContentLoaded', function() {
@@ -316,7 +316,7 @@
         });
 
         // Handle form submission
-        document.getElementById('verifyActivationForm').addEventListener('submit', async function(e) {
+        document.getElementById('verifyActivationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
@@ -325,7 +325,7 @@
             const email = document.getElementById('email').value;
 
             if (code.length !== 6) {
-                await Swal.fire({
+                Swal.fire({
                     title: 'Error',
                     text: 'Please enter the complete 6-digit code.',
                     icon: 'error'
@@ -337,53 +337,48 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verifying...';
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/verify-activation-code`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({ email: email, code: code })
-                });
-
-                const data = await response.json();
-
+            $.ajax({
+                url: `${API_BASE_URL}/verify-activation-code`,
+                method: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({ email: email, code: code })
+            }).done(function(data) {
                 if (data.success) {
-                    await Swal.fire({
+                    Swal.fire({
                         title: 'Success!',
                         text: data.message,
                         icon: 'success'
+                    }).then(function() {
+                        // Clear stored email
+                        localStorage.removeItem('activation_email');
+
+                        // Redirect to login page
+                        window.location.href = 'login.html';
                     });
-
-                    // Clear stored email
-                    localStorage.removeItem('activation_email');
-
-                    // Redirect to login page
-                    window.location.href = 'login.html';
                 } else {
-                    await Swal.fire({
+                    Swal.fire({
                         title: 'Error',
                         text: data.message,
                         icon: 'error'
+                    }).then(function() {
+                        // Clear code inputs
+                        codeInputs.forEach(input => input.value = '');
+                        codeInputs[0].focus();
                     });
-
-                    // Clear code inputs
-                    codeInputs.forEach(input => input.value = '');
-                    codeInputs[0].focus();
                 }
-            } catch (error) {
-                console.error('Verification error:', error);
-                await Swal.fire({
+            }).fail(function(jqXHR) {
+                console.error('Verification error:', jqXHR);
+                Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'An error occurred. Please try again later.',
                 });
-            } finally {
+            }).always(function() {
                 // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Verify Code';
-            }
+            });
         });
     </script>
 </body>
