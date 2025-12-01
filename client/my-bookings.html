@@ -387,9 +387,9 @@
     };
 
     // Load user info for navigation
-    async function loadUserInfo() {
-      try {
-        const { response, data } = await apiRequest('/client/user-info');
+    function loadUserInfo() {
+      apiRequest('/client/user-info').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.user) {
           const user = data.user;
           document.getElementById('userName').textContent = `${user.fname} ${user.lname}`;
@@ -408,20 +408,20 @@
           }
           document.getElementById('profilePic').src = profilePicPath;
         }
-      } catch (error) {
-        console.error('Error loading user info:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading user info:', result);
+      });
     }
 
     // Load services for filter dropdown
-    async function loadServices() {
-      try {
-        const { response, data } = await apiRequest('/client/services');
+    function loadServices() {
+      apiRequest('/client/services').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.services) {
           const serviceSelect = document.getElementById('service-filter');
           const footerServices = document.getElementById('footerServices');
           
-          data.services.forEach(service => {
+          data.services.forEach(function(service) {
             // Add to filter dropdown
             const option = document.createElement('option');
             option.value = service.servicenum;
@@ -437,9 +437,9 @@
             footerServices.appendChild(li);
           });
         }
-      } catch (error) {
-        console.error('Error loading services:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading services:', result);
+      });
     }
 
     // Get badge class for status
@@ -477,33 +477,32 @@
     }
 
     // Load bookings
-    async function loadBookings(page = 1) {
-      try {
-        currentPage = page;
-        const container = document.getElementById('bookingsContainer');
-        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+    function loadBookings(page = 1) {
+      currentPage = page;
+      const container = document.getElementById('bookingsContainer');
+      container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
-        // Build query parameters
-        const params = new URLSearchParams({
-          page: page,
-          per_page: 6
-        });
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page,
+        per_page: 6
+      });
 
-        if (currentFilters.status) {
-          params.append('status', currentFilters.status);
-        }
-        if (currentFilters.service) {
-          params.append('service', currentFilters.service);
-        }
-        if (currentFilters.date_from) {
-          params.append('date_from', currentFilters.date_from);
-        }
-        if (currentFilters.date_to) {
-          params.append('date_to', currentFilters.date_to);
-        }
+      if (currentFilters.status) {
+        params.append('status', currentFilters.status);
+      }
+      if (currentFilters.service) {
+        params.append('service', currentFilters.service);
+      }
+      if (currentFilters.date_from) {
+        params.append('date_from', currentFilters.date_from);
+      }
+      if (currentFilters.date_to) {
+        params.append('date_to', currentFilters.date_to);
+      }
 
-        const { response, data } = await apiRequest(`/client/bookings?${params.toString()}`);
-
+      apiRequest(`/client/bookings?${params.toString()}`).done(function(result) {
+        const { response, data } = result;
         if (data.success && data.bookings) {
           if (data.bookings.length === 0) {
             container.innerHTML = `
@@ -531,8 +530,8 @@
             </div>
           `;
         }
-      } catch (error) {
-        console.error('Error loading bookings:', error);
+      }).fail(function(result) {
+        console.error('Error loading bookings:', result);
         document.getElementById('bookingsContainer').innerHTML = `
           <div class="col-12">
             <div class="alert alert-danger">
@@ -541,7 +540,7 @@
             </div>
           </div>
         `;
-      }
+      });
     }
 
     // Render bookings
@@ -549,7 +548,7 @@
       const container = document.getElementById('bookingsContainer');
       let bookingsHTML = '<div class="row g-4">';
 
-      bookings.forEach(booking => {
+      bookings.forEach(function(booking) {
         const badgeClass = getStatusBadgeClass(booking.status);
         const { date, time } = formatDateTime(booking.start);
         const endTime = calculateEndTime(booking.start, booking.duration);
@@ -699,11 +698,11 @@
     // Attach event listeners
     function attachEventListeners() {
       // Cancel booking
-      document.querySelectorAll('.cancel-booking').forEach(button => {
-        button.addEventListener('click', async function() {
+      document.querySelectorAll('.cancel-booking').forEach(function(button) {
+        button.addEventListener('click', function() {
           const booknum = this.getAttribute('data-booknum');
           
-          const result = await Swal.fire({
+          Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
             icon: 'warning',
@@ -711,41 +710,40 @@
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, cancel it!'
-          });
-
-          if (result.isConfirmed) {
-            try {
-              const { response, data } = await apiRequest(`/client/bookings/${booknum}/cancel`, {
+          }).then(function(result) {
+            if (result.isConfirmed) {
+              apiRequest(`/client/bookings/${booknum}/cancel`, {
                 method: 'POST'
-              });
-
-              if (data.success) {
-                Swal.fire({
-                  title: 'Cancelled!',
-                  text: data.message || 'Your booking has been cancelled.',
-                  icon: 'success',
-                  confirmButtonColor: '#007bff'
-                }).then(() => {
-                  loadBookings(currentPage);
-                });
-              } else {
+              }).done(function(apiResult) {
+                const { response, data } = apiResult;
+                if (data.success) {
+                  Swal.fire({
+                    title: 'Cancelled!',
+                    text: data.message || 'Your booking has been cancelled.',
+                    icon: 'success',
+                    confirmButtonColor: '#007bff'
+                  }).then(function() {
+                    loadBookings(currentPage);
+                  });
+                } else {
+                  Swal.fire({
+                    title: 'Error!',
+                    text: data.message || 'Failed to cancel booking',
+                    icon: 'error',
+                    confirmButtonColor: '#007bff'
+                  });
+                }
+              }).fail(function(apiResult) {
+                console.error('Error cancelling booking:', apiResult);
                 Swal.fire({
                   title: 'Error!',
-                  text: data.message || 'Failed to cancel booking',
+                  text: 'An error occurred while cancelling the booking. Please try again.',
                   icon: 'error',
                   confirmButtonColor: '#007bff'
                 });
-              }
-            } catch (error) {
-              console.error('Error cancelling booking:', error);
-              Swal.fire({
-                title: 'Error!',
-                text: 'An error occurred while cancelling the booking. Please try again.',
-                icon: 'error',
-                confirmButtonColor: '#007bff'
               });
             }
-          }
+          });
         });
       });
 
@@ -897,15 +895,14 @@
     });
 
     // Logout handlers
-    async function handleLogout() {
-      try {
-        const token = getAuthToken();
-        if (token) {
-          await apiRequest('/logout', { method: 'POST' });
-        }
-      } catch (error) {
-        console.error('Logout error:', error);
-      } finally {
+    function handleLogout() {
+      const token = getAuthToken();
+      if (token) {
+        apiRequest('/logout', { method: 'POST' }).always(function() {
+          removeAuthToken();
+          window.location.href = '../login.html';
+        });
+      } else {
         removeAuthToken();
         window.location.href = '../login.html';
       }
