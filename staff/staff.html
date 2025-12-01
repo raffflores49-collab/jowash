@@ -32,7 +32,7 @@
             
             <div class="profile-section">
                 <a href="edit-profile.html">
-                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='profile/default.jpg'">
+                    <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg'">
                 </a>
                 <h5 class="profile-name" id="staffName">Loading...</h5>
                 <div class="profile-role" id="staffRole">STAFF</div>
@@ -296,10 +296,14 @@
                     checkShiftStatus(user.shiftstart, user.shiftend);
                     
                     // Profile pic path
-                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    let profilePicPath = user.profilepic || 'frontend/staff/profile/default.jpg';
                     if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-                        if (!profilePicPath.startsWith('profile/')) {
-                            profilePicPath = 'profile/' + profilePicPath;
+                        if (!profilePicPath.startsWith('frontend/staff/profile/')) {
+                            if (profilePicPath.startsWith('profile/')) {
+                                profilePicPath = 'frontend/staff/' + profilePicPath;
+                            } else {
+                                profilePicPath = 'frontend/staff/profile/' + profilePicPath;
+                            }
                         }
                         profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
                     }
