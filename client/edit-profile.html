@@ -92,7 +92,7 @@
           </li>
           <li class="nav-item ms-lg-2">
             <div class="profile-dropdown">
-              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg'">
               <ul class="dropdown-menu dropdown-menu-end">
                 <li class="user-info p-3">
                   <h6 class="mb-0" id="userName">Loading...</h6>
@@ -141,7 +141,7 @@
                 <div class="row">
                   <div class="col-md-4 mb-4">
                     <div class="profile-image-container text-center">
-                      <img src="profile/default.jpg" alt="Profile Picture" class="profile-picture" id="profilePicture" onerror="this.src='profile/default.jpg'">
+                      <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg" alt="Profile Picture" class="profile-picture" id="profilePicture" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg'">
                       <label for="profile_pic" class="photo-upload-btn">
                         <i class="fas fa-camera"></i>
                       </label>
@@ -382,10 +382,14 @@
           document.getElementById('userName').textContent = `${user.fname} ${user.lname}`;
           document.getElementById('userEmail').textContent = user.email;
           
-          let profilePicPath = user.profilepic || 'profile/default.jpg';
+          let profilePicPath = user.profilepic || 'frontend/client/profile/default.jpg';
           if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-            if (!profilePicPath.startsWith('profile/')) {
-              profilePicPath = 'profile/' + profilePicPath;
+            if (!profilePicPath.startsWith('frontend/client/profile/')) {
+              if (profilePicPath.startsWith('profile/')) {
+                profilePicPath = 'frontend/client/' + profilePicPath;
+              } else {
+                profilePicPath = 'frontend/client/profile/' + profilePicPath;
+              }
             }
             profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
           }
@@ -423,10 +427,14 @@
           document.getElementById('postalcode').value = profile.postalcode || '';
 
           // Update profile image
-          let profilePicPath = profile.profilepic || 'profile/default.jpg';
+          let profilePicPath = profile.profilepic || 'frontend/client/profile/default.jpg';
           if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-            if (!profilePicPath.startsWith('profile/')) {
-              profilePicPath = 'profile/' + profilePicPath;
+            if (!profilePicPath.startsWith('frontend/client/profile/')) {
+              if (profilePicPath.startsWith('profile/')) {
+                profilePicPath = 'frontend/client/' + profilePicPath;
+              } else {
+                profilePicPath = 'frontend/client/profile/' + profilePicPath;
+              }
             }
             profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
           }
@@ -637,8 +645,12 @@
           if (data.profile && data.profile.profilepic) {
             let profilePicPath = data.profile.profilepic;
             if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-              if (!profilePicPath.startsWith('profile/')) {
-                profilePicPath = 'profile/' + profilePicPath;
+              if (!profilePicPath.startsWith('frontend/client/profile/')) {
+                if (profilePicPath.startsWith('profile/')) {
+                  profilePicPath = 'frontend/client/' + profilePicPath;
+                } else {
+                  profilePicPath = 'frontend/client/profile/' + profilePicPath;
+                }
               }
               profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
             }
