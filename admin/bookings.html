@@ -279,16 +279,15 @@
             });
 
             // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', { method: 'POST' });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                const token = getAuthToken();
+                if (token) {
+                    apiRequest('/logout', { method: 'POST' }).always(function() {
+                        removeAuthToken();
+                        window.location.href = '../login.html';
+                    });
+                } else {
                     removeAuthToken();
                     window.location.href = '../login.html';
                 }
@@ -311,8 +310,8 @@
             });
 
             // Update status form handler
-            document.getElementById('submitUpdateStatus').addEventListener('click', async function() {
-                await handleUpdateStatus();
+            document.getElementById('submitUpdateStatus').addEventListener('click', function() {
+                handleUpdateStatus();
             });
 
             // Reset form when modal is closed
@@ -322,10 +321,9 @@
         });
 
         // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/admin/user-info');
-
+        function loadUserInfo() {
+            apiRequest('/admin/user-info').done(function(result) {
+                const { response, data } = result;
                 if (data && data.success && data.user) {
                     const user = data.user;
                     const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
@@ -363,9 +361,10 @@
                         document.getElementById('welcomeName').textContent = 'Administrator';
                     }
                 }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+            }).fail(function(result) {
+                console.error('Error loading user info:', result);
+                const { response } = result;
+                if (response && (response.status === 401 || response.status === 403)) {
                     window.location.href = '../login.html';
                 } else {
                     if (document.getElementById('adminName')) {
@@ -375,24 +374,23 @@
                         document.getElementById('welcomeName').textContent = 'Administrator';
                     }
                 }
-            }
+            });
         }
 
         // Load bookings
-        async function loadBookings() {
-            try {
-                const params = new URLSearchParams({
-                    page: currentPage,
-                    per_page: 10,
-                    sort: currentSort
-                });
-                
-                if (currentSearch) {
-                    params.append('search', currentSearch);
-                }
+        function loadBookings() {
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 10,
+                sort: currentSort
+            });
+            
+            if (currentSearch) {
+                params.append('search', currentSearch);
+            }
 
-                const { response, data } = await apiRequest(`/admin/bookings?${params.toString()}`);
-
+            apiRequest(`/admin/bookings?${params.toString()}`).done(function(result) {
+                const { data } = result;
                 if (data.success) {
                     displayBookings(data.bookings);
                     displayPagination(data.pagination);
@@ -404,11 +402,11 @@
                         text: data.message || 'Failed to load bookings'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading bookings:', error);
+            }).fail(function(result) {
+                console.error('Error loading bookings:', result);
                 document.getElementById('bookingsTable').innerHTML = 
                     '<tr><td colspan="9" class="text-center text-danger">Error loading bookings</td></tr>';
-            }
+            });
         }
 
         // Display bookings in table
@@ -552,25 +550,16 @@
         }
 
         // Update booking status
-        async function updateBookingStatus(booknum, currentStatus) {
-            try {
-                document.getElementById('updateBooknum').value = booknum;
-                document.getElementById('updateStatus').value = currentStatus;
+        function updateBookingStatus(booknum, currentStatus) {
+            document.getElementById('updateBooknum').value = booknum;
+            document.getElementById('updateStatus').value = currentStatus;
 
-                const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-                modal.show();
-            } catch (error) {
-                console.error('Error opening update modal:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load booking details'
-                });
-            }
+            const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+            modal.show();
         }
 
         // Handle update status
-        async function handleUpdateStatus() {
+        function handleUpdateStatus() {
             const form = document.getElementById('updateStatusForm');
             
             if (!form.checkValidity()) {
@@ -585,13 +574,12 @@
                 status: status
             };
 
-            try {
-                const { response, data: result } = await apiRequest(`/admin/bookings/${booknum}/status`, {
-                    method: 'PUT',
-                    body: JSON.stringify(data)
-                });
-
-                if (result.success) {
+            apiRequest(`/admin/bookings/${booknum}/status`, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            }).done(function(result) {
+                const { data: resultData } = result;
+                if (resultData.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -605,17 +593,18 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: result.message || 'Failed to update booking status'
+                        text: resultData.message || 'Failed to update booking status'
                     });
                 }
-            } catch (error) {
-                console.error('Error updating booking status:', error);
+            }).fail(function(result) {
+                console.error('Error updating booking status:', result);
+                const resultData = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to update booking status: ' + (error.message || 'Unknown error')
+                    text: 'Failed to update booking status: ' + (resultData.message || 'Unknown error')
                 });
-            }
+            });
         }
     </script>
 </body>
