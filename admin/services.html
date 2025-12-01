@@ -490,9 +490,13 @@
                         document.getElementById('welcomeName').textContent = fullName;
                     }
                     
-                    let profilePicPath = user.profilepic || 'profile/default.jpg';
-                    if (!profilePicPath.startsWith('profile/') && !profilePicPath.startsWith('http')) {
-                        profilePicPath = 'profile/' + profilePicPath;
+                    let profilePicPath = user.profilepic || 'frontend/admin/profile/default.jpg';
+                    if (!profilePicPath.startsWith('frontend/admin/profile/') && !profilePicPath.startsWith('http')) {
+                        if (profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'frontend/admin/' + profilePicPath;
+                        } else {
+                            profilePicPath = 'frontend/admin/profile/' + profilePicPath;
+                        }
                     }
                     if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
                         profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
@@ -589,8 +593,16 @@
                 else if (service.category === 'DETAILING') categoryBadgeClass = 'bg-dark';
 
                 // Use backend URL for service images
-                let imageSrc = service.image || 'service/default.jpg';
+                let imageSrc = service.image || 'frontend/admin/service/default.jpg';
                 if (imageSrc && !imageSrc.startsWith('http')) {
+                    // If image path doesn't start with frontend/admin/service/, add it
+                    if (!imageSrc.startsWith('frontend/admin/service/')) {
+                        if (imageSrc.startsWith('service/')) {
+                            imageSrc = 'frontend/admin/' + imageSrc;
+                        } else {
+                            imageSrc = 'frontend/admin/service/' + imageSrc;
+                        }
+                    }
                     // If image path doesn't start with http, prepend backend URL
                     imageSrc = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageSrc}`;
                 }
@@ -600,7 +612,7 @@
                     <tr>
                         <td>${service.servicenum}</td>
                         <td>
-                            <img src="${imageSrc}" alt="${service.name}" class="service-thumbnail" onerror="this.src='service/default.jpg'">
+                            <img src="${imageSrc}" alt="${service.name}" class="service-thumbnail" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/admin/service/default.jpg'">
                         </td>
                         <td>${service.name}</td>
                         <td>₱${price}</td>
@@ -815,6 +827,14 @@
                     if (service.image) {
                         let imageSrc = service.image;
                         if (!imageSrc.startsWith('http')) {
+                            // If image path doesn't start with frontend/admin/service/, add it
+                            if (!imageSrc.startsWith('frontend/admin/service/')) {
+                                if (imageSrc.startsWith('service/')) {
+                                    imageSrc = 'frontend/admin/' + imageSrc;
+                                } else {
+                                    imageSrc = 'frontend/admin/service/' + imageSrc;
+                                }
+                            }
                             imageSrc = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageSrc}`;
                         }
                         currentImagePreview.innerHTML = `<img src="${imageSrc}" alt="${service.name}" onerror="this.parentElement.innerHTML='<span class=\\'text-muted\\'>No image</span>'">`;
