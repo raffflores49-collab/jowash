@@ -262,7 +262,7 @@
           </li>
           <li class="nav-item ms-lg-2">
             <div class="profile-dropdown">
-              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg'">
               <ul class="dropdown-menu dropdown-menu-end">
                 <li class="user-info">
                   <h6 class="mb-0" id="userName">Loading...</h6>
@@ -597,7 +597,18 @@
           
           const profilePic = document.getElementById('profilePic');
           if (data.user.profilepic) {
-            profilePic.src = `profile/${data.user.profilepic.split('/').pop()}`;
+            let profilePicPath = data.user.profilepic;
+            if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+              if (!profilePicPath.startsWith('frontend/client/profile/')) {
+                if (profilePicPath.startsWith('profile/')) {
+                  profilePicPath = 'frontend/client/' + profilePicPath;
+                } else {
+                  profilePicPath = 'frontend/client/profile/' + profilePicPath;
+                }
+              }
+              profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
+            }
+            profilePic.src = profilePicPath;
           }
         }
       } catch (error) {
@@ -621,9 +632,17 @@
           document.getElementById('serviceCategory').textContent = data.service.category;
           document.getElementById('serviceVehicleType').textContent = data.service.vehicletype;
           
-          // Set service image
-          let imageSrc = data.service.image || 'service/default.jpg';
+          // Set service image (from frontend/admin/service/)
+          let imageSrc = data.service.image || 'frontend/admin/service/default.jpg';
           if (imageSrc && !imageSrc.startsWith('http')) {
+            // If image path doesn't start with frontend/admin/service/, add it
+            if (!imageSrc.startsWith('frontend/admin/service/')) {
+              if (imageSrc.startsWith('service/')) {
+                imageSrc = 'frontend/admin/' + imageSrc;
+              } else {
+                imageSrc = 'frontend/admin/service/' + imageSrc;
+              }
+            }
             imageSrc = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageSrc}`;
           }
           document.getElementById('serviceImage').src = imageSrc;
@@ -677,7 +696,17 @@
           
           let staffHTML = '';
           data.staff.forEach(staff => {
-            const profilePic = staff.profilepic ? `../staff/profile/${staff.profilepic.split('/').pop()}` : '../staff/profile/default.jpg';
+            let profilePic = staff.profilepic || 'frontend/staff/profile/default.jpg';
+            if (!profilePic.startsWith('http://') && !profilePic.startsWith('https://')) {
+              if (!profilePic.startsWith('frontend/staff/profile/')) {
+                if (profilePic.startsWith('profile/')) {
+                  profilePic = 'frontend/staff/' + profilePic;
+                } else {
+                  profilePic = 'frontend/staff/profile/' + profilePic;
+                }
+              }
+              profilePic = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePic}`;
+            }
             const shiftStart = formatTime(staff.shiftstart);
             const shiftEnd = formatTime(staff.shiftend);
             
@@ -685,7 +714,7 @@
               <div class="col-md-6">
                 <div class="card staff-card p-3" onclick="selectStaff(${staff.staffid})" id="staff-${staff.staffid}">
                   <div class="d-flex align-items-center">
-                    <img src="${profilePic}" alt="${staff.fname} ${staff.lname}" class="staff-img me-3" onerror="this.src='../staff/profile/default.jpg'">
+                    <img src="${profilePic}" alt="${staff.fname} ${staff.lname}" class="staff-img me-3" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg'">
                     <div>
                       <h5 class="mb-1">${staff.fname} ${staff.lname}</h5>
                       <p class="mb-0 text-muted">${staff.role}</p>
