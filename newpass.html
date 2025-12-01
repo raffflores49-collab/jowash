@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
     <title>Reset Password</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.1.0/esm/ionicons.min.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/api.js"></script>
     <style>
         * {
             margin: 0;
@@ -294,8 +296,6 @@
     </div>
 
     <script>
-        // API Base URL
-        const API_BASE_URL = 'https://jowashlaravel.muccsbblock1.com/jowash-backend/api';
 
         // Check if email is stored in localStorage
         document.addEventListener('DOMContentLoaded', function() {
@@ -375,7 +375,7 @@
         });
 
         // Handle form submission
-        document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
@@ -385,7 +385,7 @@
 
             // Validate passwords match
             if (password !== confirmPassword) {
-                await Swal.fire({
+                Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Passwords do not match. Please try again.',
@@ -397,34 +397,29 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Updating...';
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/reset-password`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: resetEmail,
-                        password: password,
-                        confirm_password: confirmPassword
-                    })
-                });
-
-                const data = await response.json();
-
+            $.ajax({
+                url: `${API_BASE_URL}/reset-password`,
+                method: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({
+                    email: resetEmail,
+                    password: password,
+                    confirm_password: confirmPassword
+                })
+            }).done(function(data) {
                 if (data.success) {
                     // Remove reset email from localStorage
                     localStorage.removeItem('reset_email');
 
-                    await Swal.fire({
+                    Swal.fire({
                         title: 'Password Updated',
                         text: data.message,
                         icon: 'success'
+                    }).then(function() {
+                        // Redirect to login page
+                        window.location.href = 'login.html';
                     });
-
-                    // Redirect to login page
-                    window.location.href = 'login.html';
                 } else {
                     // Handle validation errors
                     if (data.errors) {
@@ -432,31 +427,44 @@
                         for (const field in data.errors) {
                             errorMessage += `- ${data.errors[field][0]}\n`;
                         }
-                        await Swal.fire({
+                        Swal.fire({
                             title: 'Error',
                             text: errorMessage,
                             icon: 'error'
                         });
                     } else {
-                        await Swal.fire({
+                        Swal.fire({
                             title: 'Error',
                             text: data.message,
                             icon: 'error'
                         });
                     }
                 }
-            } catch (error) {
-                console.error('Reset password error:', error);
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred. Please try again later.',
-                });
-            } finally {
+            }).fail(function(jqXHR) {
+                console.error('Reset password error:', jqXHR);
+                const data = jqXHR.responseJSON || {};
+                if (data.errors) {
+                    let errorMessage = 'Please fix the following errors:\n';
+                    for (const field in data.errors) {
+                        errorMessage += `- ${data.errors[field][0]}\n`;
+                    }
+                    Swal.fire({
+                        title: 'Error',
+                        text: errorMessage,
+                        icon: 'error'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'An error occurred. Please try again later.',
+                    });
+                }
+            }).always(function() {
                 // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Update Password';
-            }
+            });
         });
         
         // Enter Key Navigation
