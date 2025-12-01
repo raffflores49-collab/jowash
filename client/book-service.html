@@ -557,7 +557,7 @@
       }
       
       // Load service details
-      loadService(serviceId).then(() => {
+      loadService(serviceId).done(function() {
         // Load appropriate step based on URL
         if (step === 1) {
           showStep1(serviceId);
@@ -587,10 +587,9 @@
     let dateNavigation = {};
 
     // Load user information
-    async function loadUserInfo() {
-      try {
-        const { response, data } = await apiRequest('/client/user-info');
-        
+    function loadUserInfo() {
+      apiRequest('/client/user-info').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.user) {
           document.getElementById('userName').textContent = `${data.user.fname} ${data.user.lname}`;
           document.getElementById('userEmail').textContent = data.user.email;
@@ -611,16 +610,15 @@
             profilePic.src = profilePicPath;
           }
         }
-      } catch (error) {
-        console.error('Error loading user info:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading user info:', result);
+      });
     }
 
     // Load service details
-    async function loadService(serviceId) {
-      try {
-        const { response, data } = await apiRequest(`/client/services/${serviceId}`);
-        
+    function loadService(serviceId) {
+      return apiRequest(`/client/services/${serviceId}`).done(function(result) {
+        const { response, data } = result;
         if (data.success && data.service) {
           currentService = data.service;
           
@@ -647,10 +645,17 @@
           }
           document.getElementById('serviceImage').src = imageSrc;
         } else {
-          throw new Error('Service not found');
+          Swal.fire({
+            title: 'Error!',
+            text: 'Service not found',
+            icon: 'error',
+            confirmButtonColor: '#0d6efd'
+          }).then(() => {
+            window.location.href = 'client.html#services';
+          });
         }
-      } catch (error) {
-        console.error('Error loading service:', error);
+      }).fail(function(result) {
+        console.error('Error loading service:', result);
         Swal.fire({
           title: 'Error!',
           text: 'Service not found',
@@ -659,27 +664,32 @@
         }).then(() => {
           window.location.href = 'client.html#services';
         });
-      }
+      });
     }
 
     // Show Step 1: Select Staff
-    async function showStep1(serviceId) {
+    function showStep1(serviceId) {
       updateStepIndicator(1);
       document.getElementById('step1Content').style.display = 'block';
       document.getElementById('step2Content').style.display = 'none';
       document.getElementById('step3Content').style.display = 'none';
       
       if (!currentService) {
-        await loadService(serviceId);
+        loadService(serviceId).done(function() {
+          loadStaffForService(serviceId);
+        });
+      } else {
+        loadStaffForService(serviceId);
       }
-      
+    }
+
+    function loadStaffForService(serviceId) {
       // Determine staff role based on service category
       const staffRole = currentService.category === 'DETAILING' ? 'DETAILER' : 'WASHER';
       document.getElementById('staffRoleTitle').textContent = `Select a ${staffRole}`;
       
-      try {
-        const { response, data } = await apiRequest(`/client/services/${serviceId}/staff`);
-        
+      apiRequest(`/client/services/${serviceId}/staff`).done(function(result) {
+        const { response, data } = result;
         if (data.success && data.staff) {
           const staffContainer = document.getElementById('staffContainer');
           
@@ -731,8 +741,8 @@
           
           staffContainer.innerHTML = staffHTML;
         }
-      } catch (error) {
-        console.error('Error loading staff:', error);
+      }).fail(function(result) {
+        console.error('Error loading staff:', result);
         document.getElementById('staffContainer').innerHTML = `
           <div class="col-12">
             <div class="alert alert-danger">
@@ -740,7 +750,7 @@
             </div>
           </div>
         `;
-      }
+      });
     }
 
     // Select staff function
@@ -767,7 +777,7 @@
     }
 
     // Show Step 2: Choose Date and Time
-    async function showStep2(serviceId, staffId, preSelectedDate = null, startDateForNav = null) {
+    function showStep2(serviceId, staffId, preSelectedDate = null, startDateForNav = null) {
       updateStepIndicator(2);
       document.getElementById('step1Content').style.display = 'none';
       document.getElementById('step2Content').style.display = 'block';
@@ -780,22 +790,22 @@
       currentStartDate = startDateToUse;
       
       // Load available dates and booked slots
-      await loadAvailableDates(startDateToUse);
-      await loadBookedSlots(staffId);
-      
-      // If date was pre-selected, select it
-      if (preSelectedDate) {
-        setTimeout(() => {
-          selectDate(preSelectedDate);
-        }, 100);
-      }
+      loadAvailableDates(startDateToUse).done(function() {
+        loadBookedSlots(staffId).done(function() {
+          // If date was pre-selected, select it
+          if (preSelectedDate) {
+            setTimeout(function() {
+              selectDate(preSelectedDate);
+            }, 100);
+          }
+        });
+      });
     }
 
     // Load available dates
-    async function loadAvailableDates(startDate) {
-      try {
-        const { response, data } = await apiRequest(`/client/available-dates?start_date=${startDate}`);
-        
+    function loadAvailableDates(startDate) {
+      return apiRequest(`/client/available-dates?start_date=${startDate}`).done(function(result) {
+        const { response, data } = result;
         if (data.success) {
           availableDates = data.dates;
           dateNavigation = data.navigation;
@@ -804,17 +814,17 @@
           document.getElementById('currentMonthDisplay').textContent = dateNavigation.current_month;
           
           // Update navigation buttons
-          document.getElementById('prevMonthBtn').onclick = () => navigateDate(dateNavigation.prev_month);
-          document.getElementById('prevWeekBtn').onclick = () => navigateDate(dateNavigation.prev_week);
-          document.getElementById('nextWeekBtn').onclick = () => navigateDate(dateNavigation.next_week);
-          document.getElementById('nextMonthBtn').onclick = () => navigateDate(dateNavigation.next_month);
+          document.getElementById('prevMonthBtn').onclick = function() { navigateDate(dateNavigation.prev_month); };
+          document.getElementById('prevWeekBtn').onclick = function() { navigateDate(dateNavigation.prev_week); };
+          document.getElementById('nextWeekBtn').onclick = function() { navigateDate(dateNavigation.next_week); };
+          document.getElementById('nextMonthBtn').onclick = function() { navigateDate(dateNavigation.next_month); };
           
           // Render dates
           renderDates();
         }
-      } catch (error) {
-        console.error('Error loading available dates:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading available dates:', result);
+      });
     }
 
     // Render dates
@@ -841,17 +851,16 @@
     }
 
     // Load booked slots for staff
-    async function loadBookedSlots(staffId) {
-      try {
-        const { response, data } = await apiRequest(`/client/staff/${staffId}/booked-slots`);
-        
+    function loadBookedSlots(staffId) {
+      return apiRequest(`/client/staff/${staffId}/booked-slots`).done(function(result) {
+        const { response, data } = result;
         if (data.success) {
           bookedSlots = data.booked_slots;
         }
-      } catch (error) {
-        console.error('Error loading booked slots:', error);
+      }).fail(function(result) {
+        console.error('Error loading booked slots:', result);
         bookedSlots = {};
-      }
+      });
     }
 
     // Navigate dates - preserve URL parameters like original
@@ -867,9 +876,9 @@
     }
 
     // Select date
-    async function selectDate(date) {
+    function selectDate(date) {
       // Remove selected class from all date cards
-      document.querySelectorAll('.date-card').forEach(card => {
+      document.querySelectorAll('.date-card').forEach(function(card) {
         card.classList.remove('selected');
       });
       
@@ -880,17 +889,16 @@
         selectedDate = date;
         
         // Load time slots for the selected date
-        await loadTimeSlots(date);
+        loadTimeSlots(date);
       }
     }
 
     // Load time slots for selected date
-    async function loadTimeSlots(date) {
+    function loadTimeSlots(date) {
       if (!selectedStaffId || !date || !currentService) return;
       
-      try {
-        const { response, data } = await apiRequest(`/client/staff/${selectedStaffId}/time-slots?date=${date}&servicenum=${currentService.servicenum}`);
-        
+      apiRequest(`/client/staff/${selectedStaffId}/time-slots?date=${date}&servicenum=${currentService.servicenum}`).done(function(result) {
+        const { response, data } = result;
         if (data.success && data.slots) {
           const timeSlotsContainer = document.getElementById('timeSlots');
           timeSlotsContainer.innerHTML = '';
@@ -898,7 +906,7 @@
           let hasAvailableSlots = false;
           
           // Since bookings can only start from tomorrow, all slots are available
-          data.slots.forEach(slot => {
+          data.slots.forEach(function(slot) {
             hasAvailableSlots = true;
             const timeCard = document.createElement('div');
             timeCard.className = 'col-6';
@@ -925,8 +933,8 @@
           selectedTime = null;
           checkStep2Completion();
         }
-      } catch (error) {
-        console.error('Error loading time slots:', error);
+      }).fail(function(result) {
+        console.error('Error loading time slots:', result);
         document.getElementById('timeSlots').innerHTML = `
           <div class="col-12">
             <div class="alert alert-danger">
@@ -934,7 +942,7 @@
             </div>
           </div>
         `;
-      }
+      });
     }
 
     // Select time
@@ -959,7 +967,7 @@
       
       if (selectedDate && selectedTime) {
         nextButton.removeAttribute('disabled');
-        nextButton.onclick = () => {
+        nextButton.onclick = function() {
           window.location.href = `book-service.html?service=${currentService.servicenum}&step=3&staff=${selectedStaffId}&date=${selectedDate}&time=${selectedTime}`;
         };
       } else {
@@ -968,7 +976,7 @@
     }
 
     // Show Step 3: Confirmation
-    async function showStep3(serviceId, staffId, date, time) {
+    function showStep3(serviceId, staffId, date, time) {
       updateStepIndicator(3);
       document.getElementById('step1Content').style.display = 'none';
       document.getElementById('step2Content').style.display = 'none';
@@ -979,11 +987,10 @@
       selectedTime = time;
       
       // Load staff details
-      try {
-        const { response: staffResponse, data: staffData } = await apiRequest(`/client/services/${serviceId}/staff`);
-        
+      apiRequest(`/client/services/${serviceId}/staff`).done(function(result) {
+        const { response: staffResponse, data: staffData } = result;
         if (staffData.success && staffData.staff) {
-          const staff = staffData.staff.find(s => s.staffid == staffId);
+          const staff = staffData.staff.find(function(s) { return s.staffid == staffId; });
           
           if (staff && currentService) {
             // Calculate end time
@@ -1041,54 +1048,58 @@
             document.getElementById('bookingSummary').innerHTML = summaryHTML;
             
             // Set up back and confirm buttons
-            document.getElementById('backToStep2').onclick = () => {
+            document.getElementById('backToStep2').onclick = function() {
               window.location.href = `book-service.html?service=${serviceId}&step=2&staff=${staffId}`;
             };
             
-            document.getElementById('confirmBookingBtn').onclick = () => {
+            document.getElementById('confirmBookingBtn').onclick = function() {
               confirmBooking(serviceId, staffId, date, time);
             };
           }
         }
-      } catch (error) {
-        console.error('Error loading staff details:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading staff details:', result);
+      });
     }
 
     // Confirm booking
-    async function confirmBooking(serviceId, staffId, date, time) {
-      try {
-        const { response, data } = await apiRequest('/client/bookings', {
-          method: 'POST',
-          body: JSON.stringify({
-            staffid: parseInt(staffId),
-            servicenum: parseInt(serviceId),
-            date: date,
-            time: time
-          })
-        });
-        
+    function confirmBooking(serviceId, staffId, date, time) {
+      apiRequest('/client/bookings', {
+        method: 'POST',
+        body: JSON.stringify({
+          staffid: parseInt(staffId),
+          servicenum: parseInt(serviceId),
+          date: date,
+          time: time
+        })
+      }).done(function(result) {
+        const { response, data } = result;
         if (data.success) {
-          await Swal.fire({
+          Swal.fire({
             title: 'Success!',
             text: data.message || 'Booking confirmed successfully!',
             icon: 'success',
             confirmButtonColor: '#0d6efd'
+          }).then(function() {
+            window.location.href = 'my-bookings.html';
           });
-          
-          window.location.href = 'my-bookings.html';
         } else {
-          throw new Error(data.message || 'Failed to create booking');
+          Swal.fire({
+            title: 'Error!',
+            text: data.message || 'Failed to create booking',
+            icon: 'error',
+            confirmButtonColor: '#0d6efd'
+          });
         }
-      } catch (error) {
-        console.error('Error creating booking:', error);
+      }).fail(function(result) {
+        console.error('Error creating booking:', result);
         Swal.fire({
           title: 'Error!',
-          text: error.message || 'Error processing booking. Please try again.',
+          text: result.data?.message || 'Error processing booking. Please try again.',
           icon: 'error',
           confirmButtonColor: '#0d6efd'
         });
-      }
+      });
     }
 
     // Update step indicator
@@ -1134,20 +1145,16 @@
     }
 
     // Back to step 1
-    document.getElementById('backToStep1').onclick = () => {
+    document.getElementById('backToStep1').onclick = function() {
       window.location.href = `book-service.html?service=${currentService.servicenum}&step=1`;
     };
 
     // Logout functionality
-    async function handleLogout() {
-      try {
-        await logout();
-        window.location.href = '../login.html';
-      } catch (error) {
-        console.error('Logout error:', error);
+    function handleLogout() {
+      logout().always(function() {
         removeAuthToken();
         window.location.href = '../login.html';
-      }
+      });
     }
 
     document.getElementById('logoutBtn').addEventListener('click', function(e) {
