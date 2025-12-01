@@ -224,11 +224,9 @@
     <script src="../js/api.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = getAuthToken();
-            const userType = localStorage.getItem('user_type');
-
-            if (!token || userType !== 'STAFF') {
-                // Redirect to login if not authenticated or not staff
+            // Authentication check using shared helpers
+            const userInfo = getUserInfo();
+            if (!isAuthenticated() || userInfo.usertype !== 'STAFF') {
                 window.location.href = '../login.html';
                 return;
             }
@@ -249,163 +247,160 @@
                 document.querySelector('.content-wrapper').classList.toggle('expanded');
             });
 
-            // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            // Logout handler using shared logout() helper
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', {
-                            method: 'POST'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                logout().always(function() {
                     removeAuthToken();
                     window.location.href = '../login.html';
-                }
+                });
             });
         });
 
-        // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/staff/user-info');
+        // Load user information (jQuery AJAX style)
+        function loadUserInfo() {
+            apiRequest('/staff/user-info')
+                .done(function(result) {
+                    const { response, data } = result;
 
-                if (data.success && data.user) {
-                    const user = data.user;
-                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Staff';
-                    
-                    document.getElementById('staffName').textContent = fullName;
-                    document.getElementById('welcomeName').textContent = fullName;
-                    document.getElementById('staffRole').textContent = user.role || 'STAFF';
-                    document.getElementById('shiftRole').textContent = `${user.role || 'STAFF'} Shift Schedule`;
-                    
-                    // Format and display shift times
-                    if (user.shiftstart) {
-                        const startTime = formatTime(user.shiftstart);
-                        document.getElementById('shiftStart').textContent = startTime;
-                    }
-                    if (user.shiftend) {
-                        const endTime = formatTime(user.shiftend);
-                        document.getElementById('shiftEnd').textContent = endTime;
-                    }
-                    
-                    // Check if currently on shift
-                    checkShiftStatus(user.shiftstart, user.shiftend);
-                    
-                    // Profile pic path
-                    let profilePicPath = user.profilepic || 'frontend/staff/profile/default.jpg';
-                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-                        if (!profilePicPath.startsWith('frontend/staff/profile/')) {
-                            if (profilePicPath.startsWith('profile/')) {
-                                profilePicPath = 'frontend/staff/' + profilePicPath;
-                            } else {
-                                profilePicPath = 'frontend/staff/profile/' + profilePicPath;
-                            }
-                        }
-                        profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
-                    }
-                    document.getElementById('profilePic').src = profilePicPath;
-                } else {
-                    console.error('Failed to load user info:', data.message || 'Unknown error');
-                    if (response && (response.status === 401 || response.status === 403)) {
-                        window.location.href = '../login.html';
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                if (error.message && error.message.includes('401')) {
-                    window.location.href = '../login.html';
-                }
-            }
-        }
-
-        // Load dashboard statistics
-        async function loadDashboardStats() {
-            try {
-                const { response, data } = await apiRequest('/staff/dashboard-stats');
-
-                if (data.success) {
-                    const stats = data.stats;
-                    document.getElementById('todayBookings').textContent = stats.today_bookings || 0;
-                    document.getElementById('pendingBookings').textContent = stats.pending_bookings || 0;
-                    document.getElementById('completedBookings').textContent = stats.completed_bookings || 0;
-                } else {
-                    console.error('Error loading dashboard stats:', data.message);
-                }
-            } catch (error) {
-                console.error('Error loading dashboard stats:', error);
-            }
-        }
-
-        // Load recent bookings
-        async function loadRecentBookings() {
-            try {
-                const { response, data } = await apiRequest('/staff/recent-bookings?limit=10');
-
-                const tbody = document.getElementById('recentBookingsTable');
-                
-                if (data.success && data.bookings && data.bookings.length > 0) {
-                    tbody.innerHTML = '';
-                    
-                    data.bookings.forEach(booking => {
-                        const statusClass = getStatusClass(booking.status);
-                        const bookingDate = new Date(booking.start);
-                        const formattedDate = bookingDate.toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        });
+                    if (data.success && data.user) {
+                        const user = data.user;
+                        const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Staff';
                         
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>#${booking.booknum}</td>
-                            <td>${booking.fname} ${booking.lname}</td>
-                            <td>
-                                <strong>${booking.service_name}</strong><br>
-                                <small class="text-muted">
-                                    ${booking.vehicletype} | 
-                                    ${booking.duration} mins | 
-                                    ₱${parseFloat(booking.price).toFixed(2)}
-                                </small>
-                            </td>
-                            <td>${formattedDate}</td>
-                            <td>
-                                <span class="badge ${statusClass}">
-                                    ${booking.status}
-                                </span>
-                            </td>
+                        document.getElementById('staffName').textContent = fullName;
+                        document.getElementById('welcomeName').textContent = fullName;
+                        document.getElementById('staffRole').textContent = user.role || 'STAFF';
+                        document.getElementById('shiftRole').textContent = `${user.role || 'STAFF'} Shift Schedule`;
+                        
+                        // Format and display shift times
+                        if (user.shiftstart) {
+                            const startTime = formatTime(user.shiftstart);
+                            document.getElementById('shiftStart').textContent = startTime;
+                        }
+                        if (user.shiftend) {
+                            const endTime = formatTime(user.shiftend);
+                            document.getElementById('shiftEnd').textContent = endTime;
+                        }
+                        
+                        // Check if currently on shift
+                        checkShiftStatus(user.shiftstart, user.shiftend);
+                        
+                        // Profile pic path
+                        let profilePicPath = user.profilepic || 'frontend/staff/profile/default.jpg';
+                        if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                            if (!profilePicPath.startsWith('frontend/staff/profile/')) {
+                                if (profilePicPath.startsWith('profile/')) {
+                                    profilePicPath = 'frontend/staff/' + profilePicPath;
+                                } else {
+                                    profilePicPath = 'frontend/staff/profile/' + profilePicPath;
+                                }
+                            }
+                            profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
+                        }
+                        document.getElementById('profilePic').src = profilePicPath;
+                    } else {
+                        console.error('Failed to load user info:', data.message || 'Unknown error');
+                        if (response && (response.status === 401 || response.status === 403)) {
+                            window.location.href = '../login.html';
+                            return;
+                        }
+                    }
+                })
+                .fail(function(error) {
+                    console.error('Error loading user info:', error);
+                    // If we can detect auth errors from error object, redirect
+                    if (error && error.response && (error.response.status === 401 || error.response.status === 403)) {
+                        window.location.href = '../login.html';
+                    }
+                });
+        }
+
+        // Load dashboard statistics (jQuery AJAX style)
+        function loadDashboardStats() {
+            apiRequest('/staff/dashboard-stats')
+                .done(function(result) {
+                    const { data } = result;
+
+                    if (data.success) {
+                        const stats = data.stats;
+                        document.getElementById('todayBookings').textContent = stats.today_bookings || 0;
+                        document.getElementById('pendingBookings').textContent = stats.pending_bookings || 0;
+                        document.getElementById('completedBookings').textContent = stats.completed_bookings || 0;
+                    } else {
+                        console.error('Error loading dashboard stats:', data.message);
+                    }
+                })
+                .fail(function(error) {
+                    console.error('Error loading dashboard stats:', error);
+                });
+        }
+
+        // Load recent bookings (jQuery AJAX style)
+        function loadRecentBookings() {
+            apiRequest('/staff/recent-bookings?limit=10')
+                .done(function(result) {
+                    const { data } = result;
+                    const tbody = document.getElementById('recentBookingsTable');
+                    
+                    if (data.success && data.bookings && data.bookings.length > 0) {
+                        tbody.innerHTML = '';
+                        
+                        data.bookings.forEach(function(booking) {
+                            const statusClass = getStatusClass(booking.status);
+                            const bookingDate = new Date(booking.start);
+                            const formattedDate = bookingDate.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                            });
+                            
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>#${booking.booknum}</td>
+                                <td>${booking.fname} ${booking.lname}</td>
+                                <td>
+                                    <strong>${booking.service_name}</strong><br>
+                                    <small class="text-muted">
+                                        ${booking.vehicletype} | 
+                                        ${booking.duration} mins | 
+                                        ₱${parseFloat(booking.price).toFixed(2)}
+                                    </small>
+                                </td>
+                                <td>${formattedDate}</td>
+                                <td>
+                                    <span class="badge ${statusClass}">
+                                        ${booking.status}
+                                    </span>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                                    <p class="mt-2">No bookings assigned to you yet</p>
+                                </td>
+                            </tr>
                         `;
-                        tbody.appendChild(row);
-                    });
-                } else {
+                    }
+                })
+                .fail(function(error) {
+                    console.error('Error loading recent bookings:', error);
+                    const tbody = document.getElementById('recentBookingsTable');
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <i class="bi bi-calendar-x fs-1 text-muted"></i>
-                                <p class="mt-2">No bookings assigned to you yet</p>
+                            <td colspan="5" class="text-center py-4 text-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <p class="mt-2">Error loading bookings. Please try again.</p>
                             </td>
                         </tr>
                     `;
-                }
-            } catch (error) {
-                console.error('Error loading recent bookings:', error);
-                const tbody = document.getElementById('recentBookingsTable');
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center py-4 text-danger">
-                            <i class="bi bi-exclamation-triangle"></i>
-                            <p class="mt-2">Error loading bookings. Please try again.</p>
-                        </td>
-                    </tr>
-                `;
-            }
+                });
         }
 
         // Format time from HH:mm:ss to hh:mm AM/PM
