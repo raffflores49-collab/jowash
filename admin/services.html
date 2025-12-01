@@ -418,16 +418,15 @@
             });
 
             // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', { method: 'POST' });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                const token = getAuthToken();
+                if (token) {
+                    apiRequest('/logout', { method: 'POST' }).always(function() {
+                        removeAuthToken();
+                        window.location.href = '../login.html';
+                    });
+                } else {
                     removeAuthToken();
                     window.location.href = '../login.html';
                 }
@@ -447,8 +446,8 @@
                 previewImage(this, 'addImagePreview');
             });
 
-            document.getElementById('submitAddService').addEventListener('click', async function() {
-                await handleAddService();
+            document.getElementById('submitAddService').addEventListener('click', function() {
+                handleAddService();
             });
 
             // Edit service form handlers
@@ -457,8 +456,8 @@
                 document.getElementById('editNewImagePreviewContainer').style.display = 'block';
             });
 
-            document.getElementById('submitEditService').addEventListener('click', async function() {
-                await handleEditService();
+            document.getElementById('submitEditService').addEventListener('click', function() {
+                handleEditService();
             });
 
             // Reset add form when modal is closed
@@ -475,10 +474,9 @@
         });
 
         // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/admin/user-info');
-
+        function loadUserInfo() {
+            apiRequest('/admin/user-info').done(function(result) {
+                const { response, data } = result;
                 if (data && data.success && data.user) {
                     const user = data.user;
                     const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
@@ -516,9 +514,10 @@
                         document.getElementById('welcomeName').textContent = 'Administrator';
                     }
                 }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+            }).fail(function(result) {
+                console.error('Error loading user info:', result);
+                const { response } = result;
+                if (response && (response.status === 401 || response.status === 403)) {
                     window.location.href = '../login.html';
                 } else {
                     if (document.getElementById('adminName')) {
@@ -528,23 +527,22 @@
                         document.getElementById('welcomeName').textContent = 'Administrator';
                     }
                 }
-            }
+            });
         }
 
         // Load services
-        async function loadServices() {
-            try {
-                const params = new URLSearchParams({
-                    page: currentPage,
-                    per_page: 8
-                });
-                
-                if (currentSearch) {
-                    params.append('search', currentSearch);
-                }
+        function loadServices() {
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 8
+            });
+            
+            if (currentSearch) {
+                params.append('search', currentSearch);
+            }
 
-                const { response, data } = await apiRequest(`/admin/services?${params.toString()}`);
-
+            apiRequest(`/admin/services?${params.toString()}`).done(function(result) {
+                const { data } = result;
                 if (data.success) {
                     displayServices(data.services);
                     displayPagination(data.pagination);
@@ -556,11 +554,11 @@
                         text: data.message || 'Failed to load services'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading services:', error);
+            }).fail(function(result) {
+                console.error('Error loading services:', result);
                 document.getElementById('servicesTable').innerHTML = 
                     '<tr><td colspan="9" class="text-center text-danger">Error loading services</td></tr>';
-            }
+            });
         }
 
         // Display services in table
@@ -738,7 +736,7 @@
         }
 
         // Handle add service
-        async function handleAddService() {
+        function handleAddService() {
             const form = document.getElementById('addServiceForm');
             
             if (!form.checkValidity()) {
@@ -748,38 +746,13 @@
 
             const formData = new FormData(form);
 
-            try {
-                // Create a custom request for FormData (don't use apiRequest which sets JSON headers)
-                const token = getAuthToken();
-                if (!token) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'You are not authenticated. Please login again.'
-                    }).then(() => {
-                        window.location.href = '../login.html';
-                    });
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE_URL}/admin/services`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                        // Don't set Content-Type - let browser set it with boundary for FormData
-                    },
-                    body: formData
-                });
-
-                let result;
-                try {
-                    result = await response.json();
-                } catch (e) {
-                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                }
-
-                if (result.success) {
+            // Use apiRequest which now handles FormData
+            apiRequest('/admin/services', {
+                method: 'POST',
+                body: formData
+            }).done(function(result) {
+                const { data } = result;
+                if (data.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -793,24 +766,24 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: result.message || 'Failed to create service'
+                        text: data.message || 'Failed to create service'
                     });
                 }
-            } catch (error) {
-                console.error('Error adding service:', error);
+            }).fail(function(result) {
+                console.error('Error adding service:', result);
+                const data = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to create service: ' + (error.message || 'Unknown error')
+                    text: 'Failed to create service: ' + (data.message || 'Unknown error')
                 });
-            }
+            });
         }
 
         // Edit service
-        async function editService(servicenum) {
-            try {
-                const { response, data } = await apiRequest(`/admin/services/${servicenum}`);
-
+        function editService(servicenum) {
+            apiRequest(`/admin/services/${servicenum}`).done(function(result) {
+                const { data } = result;
                 if (data.success && data.service) {
                     const service = data.service;
                     document.getElementById('editServicenum').value = service.servicenum;
@@ -851,18 +824,19 @@
                         text: data.message || 'Failed to load service details'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading service:', error);
+            }).fail(function(result) {
+                console.error('Error loading service:', result);
+                const data = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to load service details'
+                    text: data.message || 'Failed to load service details'
                 });
-            }
+            });
         }
 
         // Handle edit service
-        async function handleEditService() {
+        function handleEditService() {
             const form = document.getElementById('editServiceForm');
             
             if (!form.checkValidity()) {
@@ -899,38 +873,13 @@
                 submitFormData.append('image', imageInput.files[0]);
             }
 
-            try {
-                // Create a custom request for FormData
-                const token = getAuthToken();
-                if (!token) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'You are not authenticated. Please login again.'
-                    }).then(() => {
-                        window.location.href = '../login.html';
-                    });
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE_URL}/admin/services/${servicenum}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                        // Don't set Content-Type - let browser set it with boundary for FormData
-                    },
-                    body: submitFormData
-                });
-
-                let result;
-                try {
-                    result = await response.json();
-                } catch (e) {
-                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                }
-
-                if (result.success) {
+            // Use apiRequest which now handles FormData
+            apiRequest(`/admin/services/${servicenum}`, {
+                method: 'POST',
+                body: submitFormData
+            }).done(function(result) {
+                const { data } = result;
+                if (data.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -944,22 +893,23 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: result.message || 'Failed to update service'
+                        text: data.message || 'Failed to update service'
                     });
                 }
-            } catch (error) {
-                console.error('Error updating service:', error);
+            }).fail(function(result) {
+                console.error('Error updating service:', result);
+                const data = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to update service: ' + (error.message || 'Unknown error')
+                    text: 'Failed to update service: ' + (data.message || 'Unknown error')
                 });
-            }
+            });
         }
 
         // Archive service
-        async function archiveService(servicenum) {
-            const result = await Swal.fire({
+        function archiveService(servicenum) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "This service will be archived (set to INACTIVE).",
                 icon: 'warning',
@@ -967,43 +917,43 @@
                 confirmButtonColor: '#ffc107',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, archive it!'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const { response, data } = await apiRequest(`/admin/services/${servicenum}/archive`, {
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    apiRequest(`/admin/services/${servicenum}/archive`, {
                         method: 'POST'
-                    });
-
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Archived!',
-                            text: 'Service has been archived successfully'
-                        }).then(() => {
-                            loadServices();
-                        });
-                    } else {
+                    }).done(function(response) {
+                        const { data } = response;
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Archived!',
+                                text: 'Service has been archived successfully'
+                            }).then(() => {
+                                loadServices();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'Failed to archive service'
+                            });
+                        }
+                    }).fail(function(response) {
+                        console.error('Error archiving service:', response);
+                        const data = response.data || {};
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
                             text: data.message || 'Failed to archive service'
                         });
-                    }
-                } catch (error) {
-                    console.error('Error archiving service:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Failed to archive service'
                     });
                 }
-            }
+            });
         }
 
         // Restore service
-        async function restoreService(servicenum) {
-            const result = await Swal.fire({
+        function restoreService(servicenum) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "This service will be restored (set to ACTIVE).",
                 icon: 'question',
@@ -1011,38 +961,38 @@
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, restore it!'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const { response, data } = await apiRequest(`/admin/services/${servicenum}/restore`, {
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    apiRequest(`/admin/services/${servicenum}/restore`, {
                         method: 'POST'
-                    });
-
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Restored!',
-                            text: 'Service has been restored successfully'
-                        }).then(() => {
-                            loadServices();
-                        });
-                    } else {
+                    }).done(function(response) {
+                        const { data } = response;
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Restored!',
+                                text: 'Service has been restored successfully'
+                            }).then(() => {
+                                loadServices();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'Failed to restore service'
+                            });
+                        }
+                    }).fail(function(response) {
+                        console.error('Error restoring service:', response);
+                        const data = response.data || {};
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
                             text: data.message || 'Failed to restore service'
                         });
-                    }
-                } catch (error) {
-                    console.error('Error restoring service:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Failed to restore service'
                     });
                 }
-            }
+            });
         }
     </script>
 </body>
