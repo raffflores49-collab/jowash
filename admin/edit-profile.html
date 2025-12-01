@@ -385,12 +385,11 @@
         }
 
         // Load profile data
-        async function loadProfile() {
-            try {
-                const { response, data } = await apiRequest('/admin/profile', {
-                    method: 'GET'
-                });
-
+        function loadProfile() {
+            apiRequest('/admin/profile', {
+                method: 'GET'
+            }).done(function(result) {
+                const { response, data } = result;
                 if (data.success && data.profile) {
                     const profile = data.profile;
                     
@@ -434,7 +433,7 @@
                     document.getElementById('profileRole').textContent = profile.usertype || 'ADMIN';
                 } else {
                     console.error('Failed to load profile:', data.message || 'Unknown error');
-                    if (response.status === 401 || response.status === 403) {
+                    if (response && (response.status === 401 || response.status === 403)) {
                         window.location.href = '../login.html';
                     } else {
                         Swal.fire({
@@ -444,14 +443,19 @@
                         });
                     }
                 }
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Failed to load profile. Please try again.',
-                    icon: 'error'
-                });
-            }
+            }).fail(function(result) {
+                console.error('Error loading profile:', result);
+                const { response } = result;
+                if (response && (response.status === 401 || response.status === 403)) {
+                    window.location.href = '../login.html';
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to load profile. Please try again.',
+                        icon: 'error'
+                    });
+                }
+            });
         }
 
         // Handle profile picture preview
@@ -467,7 +471,7 @@
         });
 
         // Handle form submission
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const submitBtn = document.getElementById('submitBtn');
@@ -475,28 +479,19 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving...';
 
-            try {
-                const token = getAuthToken();
-                const formData = new FormData(this);
-                
-                // Remove userid and usertype from form data (readonly fields)
-                formData.delete('userid');
-                formData.delete('usertype');
-                formData.delete('email');
+            const formData = new FormData(this);
+            
+            // Remove userid and usertype from form data (readonly fields)
+            formData.delete('userid');
+            formData.delete('usertype');
+            formData.delete('email');
 
-                // Use fetch directly for FormData (can't use apiRequest as it sets JSON Content-Type)
-                const response = await fetch(`${API_BASE_URL}/admin/profile`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                        // Don't set Content-Type - let browser set it with boundary for FormData
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-
+            // Use apiRequest which now handles FormData
+            apiRequest('/admin/profile', {
+                method: 'POST',
+                body: formData
+            }).done(function(result) {
+                const { data } = result;
                 if (data.success) {
                     // Update profile image if new one was uploaded
                     if (data.profile && data.profile.profilepic) {
@@ -532,25 +527,25 @@
                         confirmButtonText: 'OK'
                     });
                 }
-            } catch (error) {
-                console.error('Error updating profile:', error);
+            }).fail(function(result) {
+                console.error('Error updating profile:', result);
+                const data = result.data || {};
                 Swal.fire({
                     title: 'Error!',
-                    text: 'An error occurred while updating your profile. Please try again.',
+                    text: data.message || 'An error occurred while updating your profile. Please try again.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
-            } finally {
+            }).always(function() {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
-            }
+            });
         });
 
         // Load sidebar user info
-        async function loadSidebarInfo() {
-            try {
-                const { response, data } = await apiRequest('/admin/user-info');
-
+        function loadSidebarInfo() {
+            apiRequest('/admin/user-info').done(function(result) {
+                const { data } = result;
                 if (data.success && data.user) {
                     const user = data.user;
                     const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
@@ -571,9 +566,9 @@
                     }
                     document.getElementById('sidebarProfilePic').src = profilePicPath;
                 }
-            } catch (error) {
-                console.error('Error loading sidebar info:', error);
-            }
+            }).fail(function(result) {
+                console.error('Error loading sidebar info:', result);
+            });
         }
 
         // Initialize page
@@ -588,18 +583,17 @@
             }
 
             // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', {
-                            method: 'POST'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                const token = getAuthToken();
+                if (token) {
+                    apiRequest('/logout', {
+                        method: 'POST'
+                    }).always(function() {
+                        removeAuthToken();
+                        window.location.href = '../login.html';
+                    });
+                } else {
                     removeAuthToken();
                     window.location.href = '../login.html';
                 }
