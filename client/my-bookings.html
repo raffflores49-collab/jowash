@@ -149,7 +149,7 @@
           </li>
           <li class="nav-item ms-lg-2">
             <div class="profile-dropdown">
-              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/client/profile/default.jpg'">
               <ul class="dropdown-menu dropdown-menu-end">
                 <li class="user-info p-3">
                   <h6 class="mb-0" id="userName">Loading...</h6>
@@ -395,10 +395,14 @@
           document.getElementById('userName').textContent = `${user.fname} ${user.lname}`;
           document.getElementById('userEmail').textContent = user.email;
           
-          let profilePicPath = user.profilepic || 'profile/default.jpg';
+          let profilePicPath = user.profilepic || 'frontend/client/profile/default.jpg';
           if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-            if (!profilePicPath.startsWith('profile/')) {
-              profilePicPath = 'profile/' + profilePicPath;
+            if (!profilePicPath.startsWith('frontend/client/profile/')) {
+              if (profilePicPath.startsWith('profile/')) {
+                profilePicPath = 'frontend/client/' + profilePicPath;
+              } else {
+                profilePicPath = 'frontend/client/profile/' + profilePicPath;
+              }
             }
             profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
           }
@@ -551,8 +555,16 @@
         const endTime = calculateEndTime(booking.start, booking.duration);
         
         // Get image URL (service images are in frontend/admin/service/)
-        let imageUrl = booking.image || 'service/default.jpg';
+        let imageUrl = booking.image || 'frontend/admin/service/default.jpg';
         if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          // If image path doesn't start with frontend/admin/service/, add it
+          if (!imageUrl.startsWith('frontend/admin/service/')) {
+            if (imageUrl.startsWith('service/')) {
+              imageUrl = 'frontend/admin/' + imageUrl;
+            } else {
+              imageUrl = 'frontend/admin/service/' + imageUrl;
+            }
+          }
           imageUrl = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageUrl}`;
         }
 
@@ -560,7 +572,7 @@
           <div class="col-md-6 col-lg-4">
             <div class="booking-card">
               <div class="position-relative">
-                <img src="${imageUrl}" class="booking-image" alt="${booking.service_name}" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/service/default.jpg'">
+                <img src="${imageUrl}" class="booking-image" alt="${booking.service_name}" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/admin/service/default.jpg'">
                 <span class="badge status-badge ${badgeClass}">${booking.status}</span>
               </div>
               <div class="booking-details">
@@ -763,14 +775,22 @@
       const { date, time } = formatDateTime(booking.start);
       const endTime = calculateEndTime(booking.start, booking.duration);
       
-      let imageUrl = booking.image || 'service/default.jpg';
+      let imageUrl = booking.image || 'frontend/admin/service/default.jpg';
       if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        // If image path doesn't start with frontend/admin/service/, add it
+        if (!imageUrl.startsWith('frontend/admin/service/')) {
+          if (imageUrl.startsWith('service/')) {
+            imageUrl = 'frontend/admin/' + imageUrl;
+          } else {
+            imageUrl = 'frontend/admin/service/' + imageUrl;
+          }
+        }
         imageUrl = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${imageUrl}`;
       }
 
       content.innerHTML = `
         <div class="text-center mb-3">
-          <img src="${imageUrl}" alt="${booking.service_name}" class="img-fluid rounded mb-3" style="max-height: 200px;" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/service/default.jpg'">
+          <img src="${imageUrl}" alt="${booking.service_name}" class="img-fluid rounded mb-3" style="max-height: 200px;" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/admin/service/default.jpg'">
           <h4>${booking.service_name}</h4>
           <div class="d-inline-block">
             <span class="badge ${badgeClass}">${booking.status}</span>
