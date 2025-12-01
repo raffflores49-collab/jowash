@@ -451,10 +451,9 @@
     });
     
     // Load user information
-    async function loadUserInfo() {
-      try {
-        const { response, data } = await apiRequest('/client/user-info');
-        
+    function loadUserInfo() {
+      apiRequest('/client/user-info').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.user) {
           document.getElementById('userName').textContent = `${data.user.fname} ${data.user.lname}`;
           document.getElementById('userEmail').textContent = data.user.email;
@@ -476,16 +475,15 @@
             profilePic.src = profilePicPath;
           }
         }
-      } catch (error) {
-        console.error('Error loading user info:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading user info:', result);
+      });
     }
 
     // Load services
-    async function loadServices() {
-      try {
-        const { response, data } = await apiRequest('/client/services');
-        
+    function loadServices() {
+      apiRequest('/client/services').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.services) {
           const servicesContainer = document.getElementById('servicesContainer');
           const footerServices = document.getElementById('footerServices');
@@ -499,7 +497,7 @@
           let footerHTML = '';
           let delay = 100;
           
-          data.services.forEach(service => {
+          data.services.forEach(function(service) {
             delay += 100;
             // Use backend URL for service images (from frontend/admin/service/)
             let imageSrc = service.image || 'frontend/admin/service/default.jpg';
@@ -540,10 +538,10 @@
           servicesContainer.innerHTML = servicesHTML;
           footerServices.innerHTML = footerHTML;
         }
-      } catch (error) {
-        console.error('Error loading services:', error);
+      }).fail(function(result) {
+        console.error('Error loading services:', result);
         document.getElementById('servicesContainer').innerHTML = '<div class="col-12 text-center"><p class="text-danger">Error loading services. Please try again later.</p></div>';
-      }
+      });
     }
     
     // Smooth scrolling for anchor links
@@ -582,16 +580,11 @@
     });
 
     // Logout functionality
-    async function handleLogout() {
-      try {
-        await logout();
-        window.location.href = '../login.html';
-      } catch (error) {
-        console.error('Logout error:', error);
-        // Still redirect even if logout API fails
+    function handleLogout() {
+      logout().always(function() {
         removeAuthToken();
         window.location.href = '../login.html';
-      }
+      });
     }
 
     document.getElementById('logoutBtn').addEventListener('click', function(e) {
