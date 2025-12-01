@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
     <title>Login</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.1.0/esm/ionicons.min.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/api.js"></script>
     <style>
         * {
             margin: 0;
@@ -263,8 +265,6 @@
     </div>
 
     <script>
-        // API Base URL - Update this to match your Laravel API URL
-        const API_BASE_URL = 'https://jowashlaravel.muccsbblock1.com/jowash-backend/api';
 
         // Load the road animation
         document.addEventListener('DOMContentLoaded', function() {
@@ -319,7 +319,7 @@
         });
 
         // Handle form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
@@ -330,21 +330,16 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Signing In...';
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        pass: password
-                    })
-                });
-
-                const data = await response.json();
-
+            $.ajax({
+                url: `${API_BASE_URL}/login`,
+                method: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({
+                    email: email,
+                    pass: password
+                })
+            }).done(function(data) {
                 if (data.success) {
                     // Store token in localStorage
                     localStorage.setItem('auth_token', data.token);
@@ -353,19 +348,19 @@
                     localStorage.setItem('user_id', data.user.userid);
 
                     // Show success message
-                    await Swal.fire({
+                    Swal.fire({
                         title: 'Login Successful!',
                         text: 'Redirecting...',
                         icon: 'success'
+                    }).then(function() {
+                        // Redirect based on user type
+                        // The redirect path from API is relative to frontend folder
+                        window.location.href = data.redirect;
                     });
-
-                    // Redirect based on user type
-                    // The redirect path from API is relative to frontend folder
-                    window.location.href = data.redirect;
                 } else {
                     // Handle different error cases
                     if (data.should_register) {
-                        const result = await Swal.fire({
+                        Swal.fire({
                             title: 'Are you sure?',
                             text: data.message,
                             icon: 'warning',
@@ -373,37 +368,38 @@
                             confirmButtonColor: '#3085d6',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Yes, register now!'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                window.location.href = 'register.html';
+                            }
                         });
-
-                        if (result.isConfirmed) {
-                            window.location.href = 'register.html';
-                        }
                     } else if (data.account_deleted) {
-                        await Swal.fire({
+                        Swal.fire({
                             icon: 'error',
                             title: 'Account Deleted',
                             html: data.message.replace(/Contact Number:/g, '<br>Contact Number:'),
                         });
                     } else {
-                        await Swal.fire({
+                        Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
                             text: data.message,
                         });
                     }
                 }
-            } catch (error) {
-                console.error('Login error:', error);
-                await Swal.fire({
+            }).fail(function(jqXHR) {
+                console.error('Login error:', jqXHR);
+                const data = jqXHR.responseJSON || {};
+                Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'An error occurred. Please try again later.',
+                    text: data.message || 'An error occurred. Please try again later.',
                 });
-            } finally {
+            }).always(function() {
                 // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';
-            }
+            });
         });
         
         // Enter Key Navigation
