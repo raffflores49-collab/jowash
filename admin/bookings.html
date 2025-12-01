@@ -337,9 +337,13 @@
                         document.getElementById('welcomeName').textContent = fullName;
                     }
                     
-                    let profilePicPath = user.profilepic || 'profile/default.jpg';
-                    if (!profilePicPath.startsWith('profile/') && !profilePicPath.startsWith('http')) {
-                        profilePicPath = 'profile/' + profilePicPath;
+                    let profilePicPath = user.profilepic || 'frontend/admin/profile/default.jpg';
+                    if (!profilePicPath.startsWith('frontend/admin/profile/') && !profilePicPath.startsWith('http')) {
+                        if (profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'frontend/admin/' + profilePicPath;
+                        } else {
+                            profilePicPath = 'frontend/admin/profile/' + profilePicPath;
+                        }
                     }
                     if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
                         profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
