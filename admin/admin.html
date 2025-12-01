@@ -234,10 +234,14 @@
                     document.getElementById('welcomeName').textContent = fullName;
                     
                     // Profile pic path - use the path from API or default
-                    let profilePicPath = user.profilepic || 'profile/default.jpg';
-                    // If path doesn't start with profile/, add it
-                    if (!profilePicPath.startsWith('profile/')) {
-                        profilePicPath = 'profile/' + profilePicPath;
+                    let profilePicPath = user.profilepic || 'frontend/admin/profile/default.jpg';
+                    // If path doesn't start with frontend/admin/profile/, add it
+                    if (!profilePicPath.startsWith('frontend/admin/profile/') && !profilePicPath.startsWith('http')) {
+                        if (profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'frontend/admin/' + profilePicPath;
+                        } else {
+                            profilePicPath = 'frontend/admin/profile/' + profilePicPath;
+                        }
                     }
                     if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
                         profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
