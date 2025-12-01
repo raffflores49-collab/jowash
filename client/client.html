@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JoWash - Professional Car Wash Services</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/client.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="client.html">
+        <img src="assets/images/tyre.png" alt="JoWash Logo">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="client.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#services">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#contact">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-primary" href="#" id="logoutBtn">Logout</a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <div class="profile-dropdown">
+              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li class="user-info">
+                  <h6 class="mb-0" id="userName">Loading...</h6>
+                  <small class="text-muted" id="userEmail">Loading...</small>
+                </li>
+                <li><a class="dropdown-item" href="edit-profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                <li><a class="dropdown-item" href="my-bookings.html"><i class="fas fa-calendar-check"></i> My Bookings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutDropdownBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="home">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+          <h1 class="display-4 fw-bold mb-4">Professional Car Wash Services at Your Fingertips</h1>
+          <p class="lead mb-4">Book your car wash appointment online in just a few clicks. Experience premium service with JoWash.</p>
+          <a href="#services" class="btn btn-primary btn-lg me-3">Book Now</a>
+          <a href="#services" class="btn btn-outline-light btn-lg">Explore Services</a>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000">
+          <div class="lottie-container" id="car-wash-animation"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="py-5 py-lg-8" id="services">
+    <div class="container">
+      <div class="row text-center mb-5">
+        <div class="col-lg-8 mx-auto">
+          <h2 class="fw-bold mb-3" data-aos="fade-up">Our Premium Services</h2>
+          <p class="text-muted" data-aos="fade-up" data-aos-delay="100">Choose from our wide range of professional car wash services</p>
+        </div>
+      </div>
+      <div class="row g-4" id="servicesContainer">
+        <!-- Services will be loaded here -->
+        <div class="col-12 text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-5 py-lg-8 bg-light">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+          <div class="lottie-container" id="features-animation"></div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <h2 class="fw-bold mb-4">Why Choose JoWash?</h2>
+          <div class="d-flex mb-4">
+            <div class="feature-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div>
+              <h5>Time-Saving Booking</h5>
+              <p class="text-muted mb-0">Book your appointment online and skip the waiting line.</p>
+            </div>
+          </div>
+          <div class="d-flex mb-4">
+            <div class="feature-icon">
+              <i class="fas fa-user-shield"></i>
+            </div>
+            <div>
+              <h5>Experienced Staff</h5>
+              <p class="text-muted mb-0">Our team of professionals ensures quality service every time.</p>
+            </div>
+          </div>
+          <div class="d-flex mb-4">
+            <div class="feature-icon">
+              <i class="fas fa-hand-sparkles"></i>
+            </div>
+            <div>
+              <h5>Eco-Friendly Products</h5>
+              <p class="text-muted mb-0">We use environmentally friendly cleaning solutions.</p>
+            </div>
+          </div>
+          <div class="d-flex">
+            <div class="feature-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div>
+              <h5>Satisfaction Guaranteed</h5>
+              <p class="text-muted mb-0">We're not satisfied until you are. Customer happiness is our priority.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-5 py-lg-8 testimonial-section">
+    <div class="container">
+      <div class="row text-center mb-5">
+        <div class="col-lg-8 mx-auto">
+          <h2 class="fw-bold mb-3" data-aos="fade-up">What Our Customers Say</h2>
+          <p class="text-muted" data-aos="fade-up" data-aos-delay="100">Hear from people who have experienced our services</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="testimonial-card">
+            <div class="d-flex align-items-center mb-3">
+              <img src="assets/images/girl.png" alt="Customer" class="testimonial-img">
+              <div>
+                <h5 class="mb-0">Michael K.</h5>
+                <div class="testimonial-stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mb-0">"I've been using JoWash for over a year now. The online booking system is so convenient, and the quality of service is consistently excellent."</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="testimonial-card">
+            <div class="d-flex align-items-center mb-3">
+              <img src="assets/images/girl.png" alt="Customer" class="testimonial-img">
+              <div>
+                <h5 class="mb-0">Sarah T.</h5>
+                <div class="testimonial-stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mb-0">"The Premium Detail service is worth every penny. My car looks brand new after each visit. The staff is friendly and professional."</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="testimonial-card">
+            <div class="d-flex align-items-center mb-3">
+              <img src="assets/images/girl.png" alt="Customer" class="testimonial-img">
+              <div>
+                <h5 class="mb-0">David W.</h5>
+                <div class="testimonial-stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mb-0">"JoWash is efficient, affordable, and their eco-friendly approach is something I really appreciate. Highly recommended!"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="py-5 py-lg-8 about-section" id="about">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+          <h2 class="fw-bold mb-3">About JoWash</h2>
+          <p class="mb-4">JoWash was founded in 2018 with a simple mission: to provide high-quality car wash services with maximum convenience for our customers.</p>
+          <p class="mb-4">Today, we're proud to be a trusted name in the industry, serving thousands of satisfied customers each month. Our commitment to quality, efficiency, and customer satisfaction remains at the heart of everything we do.</p>
+          <div class="row g-4 mt-2">
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle text-primary me-2"></i>
+                <p class="mb-0">Certified Professionals</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle text-primary me-2"></i>
+                <p class="mb-0">Modern Equipment</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle text-primary me-2"></i>
+                <p class="mb-0">Quality Products</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle text-primary me-2"></i>
+                <p class="mb-0">100% Satisfaction</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <div class="lottie-container" id="about-animation"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="py-5 py-lg-8 contact-section" id="contact">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 mb-5 mb-lg-0" data-aos="fade-right">
+          <h2 class="fw-bold mb-4">Get In Touch</h2>
+          <p class="mb-5">Have questions about our services? Need to schedule a special appointment? We're here to help!</p>
+          <div class="contact-info-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Our Location</h5>
+              <p class="mb-0 text-muted">123 Wash Street, Cityville, ST 12345</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Call Us</h5>
+              <p class="mb-0 text-muted">(123) 456-7890</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Email Us</h5>
+              <p class="mb-0 text-muted">info@jowash.com</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Working Hours</h5>
+              <p class="mb-0 text-muted">Mon-Sat: 8:00 AM - 7:00 PM</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7" data-aos="fade-left">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-lg-5">
+              <h3 class="fw-bold mb-4">Send Us a Message</h3>
+              <form>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="name" class="form-label">Your Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="John Doe">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" placeholder="john@example.com">
+                  </div>
+                  <div class="col-12">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" placeholder="How can we help?">
+                  </div>
+                  <div class="col-12">
+                    <label for="message" class="form-label">Your Message</label>
+                    <textarea class="form-control" id="message" rows="5" placeholder="Write your message here..."></textarea>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <img src="assets/images/tyre.png" alt="JoWash Logo" class="img-fluid mb-4" style="width: 100px;">
+          <p>JoWash provides professional car wash services with state-of-the-art equipment and eco-friendly products. Book your appointment online for a quick and efficient service.</p>
+          <div class="social-links mt-4">
+            <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2 footer-links">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="client.html">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#" id="footerLogoutBtn">Logout</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 footer-links">
+          <h5>Our Services</h5>
+          <ul id="footerServices">
+            <!-- Services will be loaded here -->
+          </ul>
+        </div>
+        <div class="col-lg-3 footer-links">
+          <h5>Working Hours</h5>
+          <ul>
+            <li>Monday - Friday: 8:00 AM - 7:00 PM</li>
+            <li>Saturday: 8:00 AM - 5:00 PM</li>
+            <li>Sunday: Closed</li>
+          </ul>
+          <h5 class="mt-4">Contact</h5>
+          <p>(123) 456-7890<br>info@jowash.com</p>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 JoWash. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <a href="#" class="btn btn-primary back-to-top position-fixed bottom-0 end-0 m-4" role="button" id="backToTopBtn">
+    <i class="fas fa-arrow-up"></i>
+  </a>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- AOS Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  
+  <!-- Lottie Player -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.14/lottie.min.js"></script>
+  
+  <!-- API Utility -->
+  <script src="../js/api.js"></script>
+  
+  <script>
+    // Check authentication
+    if (!isAuthenticated() || getUserInfo().usertype !== 'CLIENT') {
+      window.location.href = '../login.html';
+    }
+
+    // Initialize AOS
+    AOS.init();
+    
+    // Load Lottie Animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Car wash animation
+      const carWashAnimation = lottie.loadAnimation({
+        container: document.getElementById('car-wash-animation'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'https://lottie.host/4f64c12a-13b5-4199-99f1-0106fc558925/adDoQzeQMe.json'
+      });
+      
+      // Features animation
+      const featuresAnimation = lottie.loadAnimation({
+        container: document.getElementById('features-animation'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'https://assets9.lottiefiles.com/packages/lf20_5tl1xxnz.json'
+      });
+      
+      // About animation
+      const aboutAnimation = lottie.loadAnimation({
+        container: document.getElementById('about-animation'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'https://assets7.lottiefiles.com/packages/lf20_q7cvkhz4.json'
+      });
+
+      // Load user info
+      loadUserInfo();
+      
+      // Load services
+      loadServices();
+    });
+    
+    // Load user information
+    async function loadUserInfo() {
+      try {
+        const { response, data } = await apiRequest('/client/user-info');
+        
+        if (data.success && data.user) {
+          document.getElementById('userName').textContent = `${data.user.fname} ${data.user.lname}`;
+          document.getElementById('userEmail').textContent = data.user.email;
+          
+          // Set profile picture
+          const profilePic = document.getElementById('profilePic');
+          if (data.user.profilepic) {
+            profilePic.src = `profile/${data.user.profilepic.split('/').pop()}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    // Load services
+    async function loadServices() {
+      try {
+        const { response, data } = await apiRequest('/client/services');
+        
+        if (data.success && data.services) {
+          const servicesContainer = document.getElementById('servicesContainer');
+          const footerServices = document.getElementById('footerServices');
+          
+          if (data.services.length === 0) {
+            servicesContainer.innerHTML = '<div class="col-12 text-center"><p>No services available at the moment.</p></div>';
+            return;
+          }
+          
+          let servicesHTML = '';
+          let footerHTML = '';
+          let delay = 100;
+          
+          data.services.forEach(service => {
+            delay += 100;
+            // Use backend URL for service images (same as admin)
+            let imageSrc = service.image || 'service/default.jpg';
+            if (imageSrc && !imageSrc.startsWith('http')) {
+              // If image path doesn't start with http, prepend backend URL
+              imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+            }
+            
+            servicesHTML += `
+              <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="${delay}">
+                <div class="card service-card">
+                  <span class="badge bg-primary service-badge">${service.category}</span>
+                  <img src="${imageSrc}" class="card-img-top service-image" alt="${service.name}" onerror="this.src='http://127.0.0.1:8000/service/default.jpg'">
+                  <div class="card-body text-center p-4">
+                    <h5 class="card-title">${service.name}</h5>
+                    <p class="card-text text-muted mb-2">${service.description}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                      <span class="service-price">₱${parseFloat(service.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                      <span class="service-duration"><i class="far fa-clock me-1"></i>${service.duration} mins</span>
+                    </div>
+                    <a href="book-service.html?service=${service.servicenum}" class="btn btn-primary">Book Service</a>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            footerHTML += `<li><a href="book-service.html?service=${service.servicenum}">${service.name}</a></li>`;
+          });
+          
+          servicesContainer.innerHTML = servicesHTML;
+          footerServices.innerHTML = footerHTML;
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+        document.getElementById('servicesContainer').innerHTML = '<div class="col-12 text-center"><p class="text-danger">Error loading services. Please try again later.</p></div>';
+      }
+    }
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if(this.getAttribute('href') !== '#') {
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth'
+            });
+          }
+        }
+      });
+    });
+    
+    // Back to top button functionality
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.style.display = 'block';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+
+    backToTopBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Logout functionality
+    async function handleLogout() {
+      try {
+        await logout();
+        window.location.href = '../login.html';
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Still redirect even if logout API fails
+        removeAuthToken();
+        window.location.href = '../login.html';
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    document.getElementById('logoutDropdownBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    document.getElementById('footerLogoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+  </script>
+</body>
+</html>
+

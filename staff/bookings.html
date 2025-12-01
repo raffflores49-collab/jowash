@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="JoWash Staff Bookings - Manage Your Car Wash Appointments">
+    <meta name="author" content="JoWash">
+    <meta name="theme-color" content="#0061f2">
+
+    <title>JoWash | Staff Bookings</title>
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/staff.css">
+    <style>
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.35em 0.65em;
+        }
+        .action-buttons .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin: 2px;
+        }
+        .alert-account-issue {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffeeba;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ts-main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2>Jo<span>Wash</span></h2>
+            </div>
+            
+            <div class="profile-section">
+                <a href="edit-profile.html">
+                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='profile/default.jpg'">
+                </a>
+                <h5 class="profile-name" id="staffName">Loading...</h5>
+                <div class="profile-role" id="staffRole">STAFF</div>
+            </div>
+            
+            <div class="sidebar-menu-header">MAIN NAVIGATION</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="staff.html">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="bookings.html" class="active">
+                        <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                </li>
+                <li>
+                    <a href="calendar.html">
+                        <i class="bi bi-calendar-week"></i> Calendar
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-menu-header"></div>
+            
+            <div class="logout-link">
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </div>
+                    <h4 class="header-title">Manage Bookings</h4>
+                </div>
+                <div class="header-actions">
+                    <div class="header-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="container-fluid">
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <form id="filterForm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Statuses</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="APPROVED">Approved</option>
+                                    <option value="ONGOING">Ongoing</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="DECLINED">Declined</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="date" name="date">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Search</label>
+                                <input type="text" class="form-control" id="search" name="search" placeholder="Search customer or service...">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-funnel"></i> Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bookings Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Booking #</th>
+                                        <th>Customer</th>
+                                        <th>Contact</th>
+                                        <th>Service</th>
+                                        <th>Date & Time</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTable">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Bookings pagination" id="paginationContainer">
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        let currentPage = 1;
+        let currentFilters = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = getAuthToken();
+            const userType = localStorage.getItem('user_type');
+
+            if (!token || userType !== 'STAFF') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+
+            // Load user info
+            loadUserInfo();
+
+            // Check URL parameters for filters
+            const urlParams = new URLSearchParams(window.location.search);
+            const statusParam = urlParams.get('status');
+            const dateParam = urlParams.get('date');
+            
+            if (statusParam) {
+                document.getElementById('status').value = statusParam;
+            }
+            if (dateParam) {
+                document.getElementById('date').value = dateParam;
+            }
+
+            // Load bookings
+            loadBookings();
+
+            // Filter form submission
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                currentPage = 1;
+                loadBookings();
+            });
+
+            // Sidebar toggle
+            document.querySelector('.menu-toggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+                document.querySelector('.content-wrapper').classList.toggle('expanded');
+            });
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const token = getAuthToken();
+                    if (token) {
+                        await apiRequest('/logout', { method: 'POST' });
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    removeAuthToken();
+                    window.location.href = '../login.html';
+                }
+            });
+        });
+
+        // Load user information
+        async function loadUserInfo() {
+            try {
+                const { response, data } = await apiRequest('/staff/user-info');
+
+                if (data.success && data.user) {
+                    const user = data.user;
+                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Staff';
+                    
+                    document.getElementById('staffName').textContent = fullName;
+                    document.getElementById('staffRole').textContent = user.role || 'STAFF';
+                    
+                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        if (!profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'profile/' + profilePicPath;
+                        }
+                    }
+                    document.getElementById('profilePic').src = profilePicPath;
+                } else {
+                    if (response && (response.status === 401 || response.status === 403)) {
+                        window.location.href = '../login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        // Load bookings
+        async function loadBookings() {
+            try {
+                const status = document.getElementById('status').value;
+                const date = document.getElementById('date').value;
+                const search = document.getElementById('search').value;
+
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    per_page: 10
+                });
+
+                if (status) params.append('status', status);
+                if (date) params.append('date', date);
+                if (search) params.append('search', search);
+
+                const { response, data } = await apiRequest(`/staff/bookings?${params.toString()}`);
+
+                const tbody = document.getElementById('bookingsTable');
+
+                if (data.success && data.bookings && data.bookings.length > 0) {
+                    tbody.innerHTML = '';
+                    
+                    data.bookings.forEach(booking => {
+                        const statusClass = getStatusClass(booking.status);
+                        const bookingDate = new Date(booking.start);
+                        const formattedDate = bookingDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        
+                        let actionButtons = '';
+                        if (booking.status === 'PENDING') {
+                            actionButtons = `
+                                <button class="btn btn-sm btn-success" onclick="approveBooking(${booking.booknum})">
+                                    <i class="bi bi-check-lg"></i> Approve
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="declineBooking(${booking.booknum})">
+                                    <i class="bi bi-x-lg"></i> Decline
+                                </button>
+                            `;
+                        } else if (booking.status === 'APPROVED' || booking.status === 'ONGOING') {
+                            actionButtons = `
+                                <button class="btn btn-sm btn-primary" onclick="completeBooking(${booking.booknum})">
+                                    <i class="bi bi-check-circle"></i> Complete
+                                </button>
+                            `;
+                        }
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>#${booking.booknum}</td>
+                            <td>${booking.fname} ${booking.lname}</td>
+                            <td>${booking.contact || 'N/A'}</td>
+                            <td>
+                                <strong>${booking.service_name}</strong><br>
+                                <small class="text-muted">
+                                    ${booking.vehicletype} | 
+                                    ${booking.duration} mins | 
+                                    ₱${parseFloat(booking.price).toFixed(2)}
+                                </small>
+                            </td>
+                            <td>${formattedDate}</td>
+                            <td>
+                                <span class="badge ${statusClass} status-badge">
+                                    ${booking.status}
+                                </span>
+                            </td>
+                            <td class="action-buttons">
+                                ${actionButtons}
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    // Render pagination
+                    renderPagination(data.pagination);
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                                <p class="mt-2">No bookings found matching your criteria</p>
+                            </td>
+                        </tr>
+                    `;
+                    document.getElementById('paginationContainer').innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                const tbody = document.getElementById('bookingsTable');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <p class="mt-2">Error loading bookings. Please try again.</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Render pagination
+        function renderPagination(pagination) {
+            const container = document.getElementById('paginationContainer');
+            
+            if (pagination.total_pages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '<ul class="pagination justify-content-center">';
+            
+            // Previous button
+            html += `<li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${pagination.current_page - 1}); return false;">Previous</a>
+            </li>`;
+
+            // Page numbers
+            for (let i = 1; i <= pagination.total_pages; i++) {
+                if (i === 1 || i === pagination.total_pages || (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
+                    html += `<li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+                    </li>`;
+                } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
+                    html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                }
+            }
+
+            // Next button
+            html += `<li class="page-item ${pagination.current_page === pagination.total_pages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${pagination.current_page + 1}); return false;">Next</a>
+            </li>`;
+
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        // Change page
+        function changePage(page) {
+            currentPage = page;
+            loadBookings();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Approve booking
+        async function approveBooking(booknum) {
+            try {
+                const result = await Swal.fire({
+                    title: 'Approve Booking?',
+                    text: `Are you sure you want to approve booking #${booknum}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Approve',
+                    cancelButtonText: 'Cancel'
+                });
+
+                if (result.isConfirmed) {
+                    const { response, data } = await apiRequest(`/staff/bookings/${booknum}/approve`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: data.message || 'Booking approved successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            loadBookings();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to approve booking',
+                            icon: 'error'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error approving booking:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while approving the booking',
+                    icon: 'error'
+                });
+            }
+        }
+
+        // Decline booking
+        async function declineBooking(booknum) {
+            try {
+                const result = await Swal.fire({
+                    title: 'Decline Booking?',
+                    text: `Are you sure you want to decline booking #${booknum}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Decline',
+                    cancelButtonText: 'Cancel'
+                });
+
+                if (result.isConfirmed) {
+                    const { response, data } = await apiRequest(`/staff/bookings/${booknum}/decline`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: data.message || 'Booking declined successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            loadBookings();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to decline booking',
+                            icon: 'error'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error declining booking:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while declining the booking',
+                    icon: 'error'
+                });
+            }
+        }
+
+        // Complete booking
+        async function completeBooking(booknum) {
+            try {
+                const result = await Swal.fire({
+                    title: 'Complete Booking?',
+                    text: `Are you sure you want to mark booking #${booknum} as completed?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#007bff',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Complete',
+                    cancelButtonText: 'Cancel'
+                });
+
+                if (result.isConfirmed) {
+                    const { response, data } = await apiRequest(`/staff/bookings/${booknum}/complete`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: data.message || 'Booking completed successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            loadBookings();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to complete booking',
+                            icon: 'error'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error completing booking:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while completing the booking',
+                    icon: 'error'
+                });
+            }
+        }
+
+        // Get status badge class
+        function getStatusClass(status) {
+            switch(status) {
+                case 'PENDING':
+                    return 'bg-warning';
+                case 'APPROVED':
+                    return 'bg-primary';
+                case 'ONGOING':
+                    return 'bg-info';
+                case 'COMPLETED':
+                    return 'bg-success';
+                case 'CANCELLED':
+                case 'DECLINED':
+                    return 'bg-danger';
+                default:
+                    return 'bg-secondary';
+            }
+        }
+    </script>
+</body>
+
+</html>
+

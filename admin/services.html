@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="JoWash Admin Dashboard - Professional Car Wash Management System">
+    <meta name="author" content="JoWash">
+    <meta name="theme-color" content="#0061f2">
+
+    <title>JoWash | Services Management</title>
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .service-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            border: 1px dashed #ced4da;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        /* Make modals bigger and wider */
+        .modal-xl {
+            max-width: 95%;
+        }
+        @media (min-width: 1200px) {
+            .modal-xl {
+                max-width: 1400px;
+            }
+        }
+        @media (min-width: 1600px) {
+            .modal-xl {
+                max-width: 1600px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ts-main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2>Jo<span>Wash</span></h2>
+            </div>
+            
+            <div class="profile-section">
+                <a href="edit-profile.html">
+                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='profile/default.jpg'">
+                </a>
+                <h5 class="profile-name" id="adminName">Loading...</h5>
+                <div class="profile-role">Administrator</div>
+            </div>
+            
+            <div class="sidebar-menu-header">MAIN NAVIGATION</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin.html">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="accounts.html">
+                        <i class="bi bi-people"></i> Accounts
+                    </a>
+                </li>
+                <li>
+                    <a href="services.html" class="active">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
+                </li>
+                <li>
+                    <a href="staff.html">
+                        <i class="bi bi-person-badge"></i> Staff
+                    </a>
+                </li>
+                <li>
+                    <a href="bookings.html">
+                        <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-menu-header"></div>
+            
+            <div class="logout-link">
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </div>
+                    <h4 class="header-title">Services Management</h4>
+                </div>
+                <div class="header-actions">
+                    <div class="header-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Section -->
+            <div class="container-fluid">
+                <!-- Welcome Section -->
+                <div class="dashboard-welcome">
+                    <h2 class="welcome-title">Welcome back, <span id="welcomeName">Admin</span>!</h2>
+                    <p class="welcome-subtitle">Manage all car wash services in the system.</p>
+                </div>
+                
+                <!-- Services Table Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">Car Wash Services</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="search-box me-3">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Search services...">
+                                </div>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                                    <i class="bi bi-plus-circle"></i> Add Service
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Duration</th>
+                                        <th>Vehicle Type</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="servicesTable">
+                                    <tr>
+                                        <td colspan="9" class="text-center">Loading services...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-rounded justify-content-center" id="pagination">
+                                </ul>
+                            </nav>
+                            <div class="text-center mt-2">
+                                <small class="text-muted" id="paginationInfo">Loading...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Service Modal -->
+    <div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addServiceModalLabel">
+                        <i class="bi bi-plus-circle me-2"></i>Add New Service
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addServiceForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="addName" class="form-label fw-bold">Service Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="addName" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="addPrice" class="form-label fw-bold">Price (₱) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₱</span>
+                                    <input type="number" class="form-control" id="addPrice" name="price" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="addDuration" class="form-label fw-bold">Duration (minutes) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="addDuration" name="duration" min="1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="addVehicleType" class="form-label fw-bold">Vehicle Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="addVehicleType" name="vehicletype" required>
+                                    <option value="">Select Vehicle Type</option>
+                                    <option value="SEDAN">SEDAN</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="PICKUP">PICKUP</option>
+                                    <option value="VAN">VAN</option>
+                                    <option value="MOTORCYCLE">MOTORCYCLE</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="addCategory" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="addCategory" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="EXTERIOR">EXTERIOR</option>
+                                    <option value="INTERIOR">INTERIOR</option>
+                                    <option value="ENGINE">ENGINE</option>
+                                    <option value="FULL WASH">FULL WASH</option>
+                                    <option value="DETAILING">DETAILING</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="addImage" class="form-label fw-bold">Service Image <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="addImage" name="image" accept="image/*" required>
+                                <small class="form-text text-muted">Upload a high-quality image (JPG, PNG, JPEG, or GIF) up to 5MB.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="addDescription" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="addDescription" name="description" rows="4" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Image Preview</label>
+                            <div class="image-preview" id="addImagePreview">
+                                <span class="text-muted">Preview will appear here</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitAddService">
+                        <i class="bi bi-plus-circle"></i> Add Service
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Service Modal -->
+    <div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editServiceModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Service
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editServiceForm">
+                        <input type="hidden" id="editServicenum" name="servicenum">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editName" class="form-label fw-bold">Service Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editName" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editPrice" class="form-label fw-bold">Price (₱) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₱</span>
+                                    <input type="number" class="form-control" id="editPrice" name="price" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editDuration" class="form-label fw-bold">Duration (minutes) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editDuration" name="duration" min="1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editVehicleType" class="form-label fw-bold">Vehicle Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editVehicleType" name="vehicletype" required>
+                                    <option value="SEDAN">SEDAN</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="PICKUP">PICKUP</option>
+                                    <option value="VAN">VAN</option>
+                                    <option value="MOTORCYCLE">MOTORCYCLE</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editCategory" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editCategory" name="category" required>
+                                    <option value="EXTERIOR">EXTERIOR</option>
+                                    <option value="INTERIOR">INTERIOR</option>
+                                    <option value="ENGINE">ENGINE</option>
+                                    <option value="FULL WASH">FULL WASH</option>
+                                    <option value="DETAILING">DETAILING</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editStatus" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editStatus" name="status" required>
+                                    <option value="ACTIVE">ACTIVE</option>
+                                    <option value="INACTIVE">INACTIVE</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="editDescription" name="description" rows="4" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editImage" class="form-label fw-bold">Service Image</label>
+                            <input type="file" class="form-control" id="editImage" name="image" accept="image/*">
+                            <small class="form-text text-muted">Leave empty to keep current image. Upload a high-quality image (JPG, PNG, JPEG, or GIF) up to 5MB.</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Current Image</label>
+                            <div class="image-preview" id="editCurrentImagePreview">
+                                <span class="text-muted">No image</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" id="editNewImagePreviewContainer" style="display: none;">
+                            <label class="form-label fw-bold">New Image Preview</label>
+                            <div class="image-preview" id="editNewImagePreview">
+                                <span class="text-muted">Preview will appear here</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitEditService">
+                        <i class="bi bi-check-circle"></i> Update Service
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        // API_BASE_URL is already defined in api.js
+        let currentPage = 1;
+        let currentSearch = '';
+        let totalPages = 1;
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = getAuthToken();
+            const userType = localStorage.getItem('user_type');
+
+            if (!token || userType !== 'ADMIN') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+
+            // Load user info and services
+            loadUserInfo();
+            loadServices();
+
+            // Sidebar toggle
+            document.querySelector('.menu-toggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+            });
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const token = getAuthToken();
+                    if (token) {
+                        await apiRequest('/logout', { method: 'POST' });
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    removeAuthToken();
+                    window.location.href = '../login.html';
+                }
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    currentSearch = this.value.trim();
+                    currentPage = 1;
+                    loadServices();
+                }
+            });
+
+            // Add service form handlers
+            document.getElementById('addImage').addEventListener('change', function() {
+                previewImage(this, 'addImagePreview');
+            });
+
+            document.getElementById('submitAddService').addEventListener('click', async function() {
+                await handleAddService();
+            });
+
+            // Edit service form handlers
+            document.getElementById('editImage').addEventListener('change', function() {
+                previewImage(this, 'editNewImagePreview');
+                document.getElementById('editNewImagePreviewContainer').style.display = 'block';
+            });
+
+            document.getElementById('submitEditService').addEventListener('click', async function() {
+                await handleEditService();
+            });
+
+            // Reset add form when modal is closed
+            document.getElementById('addServiceModal').addEventListener('hidden.bs.modal', function() {
+                document.getElementById('addServiceForm').reset();
+                document.getElementById('addImagePreview').innerHTML = '<span class="text-muted">Preview will appear here</span>';
+            });
+
+            // Reset edit form when modal is closed
+            document.getElementById('editServiceModal').addEventListener('hidden.bs.modal', function() {
+                document.getElementById('editServiceForm').reset();
+                document.getElementById('editNewImagePreviewContainer').style.display = 'none';
+            });
+        });
+
+        // Load user information
+        async function loadUserInfo() {
+            try {
+                const { response, data } = await apiRequest('/admin/user-info');
+
+                if (data && data.success && data.user) {
+                    const user = data.user;
+                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
+                    
+                    if (document.getElementById('adminName')) {
+                        document.getElementById('adminName').textContent = fullName;
+                    }
+                    if (document.getElementById('welcomeName')) {
+                        document.getElementById('welcomeName').textContent = fullName;
+                    }
+                    
+                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    if (!profilePicPath.startsWith('profile/') && !profilePicPath.startsWith('http')) {
+                        profilePicPath = 'profile/' + profilePicPath;
+                    }
+                    if (document.getElementById('profilePic')) {
+                        document.getElementById('profilePic').src = profilePicPath;
+                    }
+                } else {
+                    if (response && (response.status === 401 || response.status === 403)) {
+                        window.location.href = '../login.html';
+                        return;
+                    }
+                    if (document.getElementById('adminName')) {
+                        document.getElementById('adminName').textContent = 'Administrator';
+                    }
+                    if (document.getElementById('welcomeName')) {
+                        document.getElementById('welcomeName').textContent = 'Administrator';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                    window.location.href = '../login.html';
+                } else {
+                    if (document.getElementById('adminName')) {
+                        document.getElementById('adminName').textContent = 'Administrator';
+                    }
+                    if (document.getElementById('welcomeName')) {
+                        document.getElementById('welcomeName').textContent = 'Administrator';
+                    }
+                }
+            }
+        }
+
+        // Load services
+        async function loadServices() {
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    per_page: 8
+                });
+                
+                if (currentSearch) {
+                    params.append('search', currentSearch);
+                }
+
+                const { response, data } = await apiRequest(`/admin/services?${params.toString()}`);
+
+                if (data.success) {
+                    displayServices(data.services);
+                    displayPagination(data.pagination);
+                    totalPages = data.pagination.total_pages;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to load services'
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+                document.getElementById('servicesTable').innerHTML = 
+                    '<tr><td colspan="9" class="text-center text-danger">Error loading services</td></tr>';
+            }
+        }
+
+        // Display services in table
+        function displayServices(services) {
+            const tbody = document.getElementById('servicesTable');
+            
+            if (!services || services.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center">No services available</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = services.map(service => {
+                // Status badge
+                const statusBadgeClass = service.status === 'ACTIVE' ? 'bg-success' : 'bg-danger';
+                
+                // Vehicle type badge
+                let vehicleBadgeClass = 'bg-info';
+                if (service.vehicletype === 'SEDAN') vehicleBadgeClass = 'bg-primary';
+                else if (service.vehicletype === 'SUV') vehicleBadgeClass = 'bg-success';
+                else if (service.vehicletype === 'PICKUP') vehicleBadgeClass = 'bg-warning text-dark';
+                else if (service.vehicletype === 'VAN') vehicleBadgeClass = 'bg-danger';
+                else if (service.vehicletype === 'MOTORCYCLE') vehicleBadgeClass = 'bg-secondary';
+                
+                // Category badge
+                let categoryBadgeClass = 'bg-info';
+                if (service.category === 'EXTERIOR') categoryBadgeClass = 'bg-primary';
+                else if (service.category === 'INTERIOR') categoryBadgeClass = 'bg-success';
+                else if (service.category === 'ENGINE') categoryBadgeClass = 'bg-warning text-dark';
+                else if (service.category === 'FULL WASH') categoryBadgeClass = 'bg-danger';
+                else if (service.category === 'DETAILING') categoryBadgeClass = 'bg-dark';
+
+                // Use backend URL for service images
+                let imageSrc = service.image || 'service/default.jpg';
+                if (imageSrc && !imageSrc.startsWith('http')) {
+                    // If image path doesn't start with http, prepend backend URL
+                    imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+                }
+                const price = parseFloat(service.price).toFixed(2);
+
+                return `
+                    <tr>
+                        <td>${service.servicenum}</td>
+                        <td>
+                            <img src="${imageSrc}" alt="${service.name}" class="service-thumbnail" onerror="this.src='service/default.jpg'">
+                        </td>
+                        <td>${service.name}</td>
+                        <td>₱${price}</td>
+                        <td>${service.duration} min</td>
+                        <td><span class="badge ${vehicleBadgeClass}">${service.vehicletype}</span></td>
+                        <td><span class="badge ${categoryBadgeClass}">${service.category}</span></td>
+                        <td><span class="badge ${statusBadgeClass}">${service.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="editService(${service.servicenum})">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </button>
+                            ${service.status === 'ACTIVE' 
+                                ? `<button class="btn btn-sm btn-warning" onclick="archiveService(${service.servicenum})">
+                                    <i class="bi bi-archive"></i> Archive
+                                   </button>`
+                                : `<button class="btn btn-sm btn-success" onclick="restoreService(${service.servicenum})">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                   </button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Display pagination
+        function displayPagination(pagination) {
+            const paginationEl = document.getElementById('pagination');
+            const infoEl = document.getElementById('paginationInfo');
+            
+            const { current_page, per_page, total, total_pages } = pagination;
+            const start = (current_page - 1) * per_page + 1;
+            const end = Math.min(current_page * per_page, total);
+            
+            infoEl.textContent = `Showing ${start}-${end} of ${total} records`;
+
+            if (total_pages <= 1) {
+                paginationEl.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // First and Previous buttons
+            if (current_page > 1) {
+                html += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(1); return false;">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${current_page - 1}); return false;">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                `;
+            }
+
+            // Page numbers
+            const startPage = Math.max(1, current_page - 2);
+            const endPage = Math.min(total_pages, current_page + 2);
+
+            if (startPage > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(1); return false;">1</a></li>`;
+                if (startPage > 2) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `
+                    <li class="page-item ${i === current_page ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
+                    </li>
+                `;
+            }
+
+            if (endPage < total_pages) {
+                if (endPage < total_pages - 1) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(${total_pages}); return false;">${total_pages}</a></li>`;
+            }
+
+            // Next and Last buttons
+            if (current_page < total_pages) {
+                html += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${current_page + 1}); return false;">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${total_pages}); return false;">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                `;
+            }
+
+            paginationEl.innerHTML = html;
+        }
+
+        // Go to page
+        function goToPage(page) {
+            currentPage = page;
+            loadServices();
+        }
+
+        // Preview image
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = '<span class="text-muted">Preview will appear here</span>';
+            }
+        }
+
+        // Handle add service
+        async function handleAddService() {
+            const form = document.getElementById('addServiceForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            try {
+                // Create a custom request for FormData (don't use apiRequest which sets JSON headers)
+                const token = getAuthToken();
+                if (!token) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'You are not authenticated. Please login again.'
+                    }).then(() => {
+                        window.location.href = '../login.html';
+                    });
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/admin/services`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                        // Don't set Content-Type - let browser set it with boundary for FormData
+                    },
+                    body: formData
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch (e) {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                }
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Service successfully created'
+                    }).then(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addServiceModal'));
+                        modal.hide();
+                        loadServices();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: result.message || 'Failed to create service'
+                    });
+                }
+            } catch (error) {
+                console.error('Error adding service:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to create service: ' + (error.message || 'Unknown error')
+                });
+            }
+        }
+
+        // Edit service
+        async function editService(servicenum) {
+            try {
+                const { response, data } = await apiRequest(`/admin/services/${servicenum}`);
+
+                if (data.success && data.service) {
+                    const service = data.service;
+                    document.getElementById('editServicenum').value = service.servicenum;
+                    document.getElementById('editName').value = service.name;
+                    document.getElementById('editPrice').value = service.price;
+                    document.getElementById('editDuration').value = service.duration;
+                    document.getElementById('editVehicleType').value = service.vehicletype;
+                    document.getElementById('editCategory').value = service.category;
+                    document.getElementById('editStatus').value = service.status;
+                    document.getElementById('editDescription').value = service.description;
+
+                    // Show current image
+                    const currentImagePreview = document.getElementById('editCurrentImagePreview');
+                    if (service.image) {
+                        let imageSrc = service.image;
+                        if (!imageSrc.startsWith('http')) {
+                            imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+                        }
+                        currentImagePreview.innerHTML = `<img src="${imageSrc}" alt="${service.name}" onerror="this.parentElement.innerHTML='<span class=\\'text-muted\\'>No image</span>'">`;
+                    } else {
+                        currentImagePreview.innerHTML = '<span class="text-muted">No image</span>';
+                    }
+
+                    const modal = new bootstrap.Modal(document.getElementById('editServiceModal'));
+                    modal.show();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to load service details'
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading service:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load service details'
+                });
+            }
+        }
+
+        // Handle edit service
+        async function handleEditService() {
+            const form = document.getElementById('editServiceForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const servicenum = formData.get('servicenum');
+
+            // Ensure all required fields are included
+            // Get values directly from form elements to ensure they're included
+            const name = document.getElementById('editName').value;
+            const description = document.getElementById('editDescription').value;
+            const price = document.getElementById('editPrice').value;
+            const duration = document.getElementById('editDuration').value;
+            const vehicletype = document.getElementById('editVehicleType').value;
+            const category = document.getElementById('editCategory').value;
+            const status = document.getElementById('editStatus').value;
+
+            // Create new FormData with all fields explicitly set
+            const submitFormData = new FormData();
+            submitFormData.append('name', name);
+            submitFormData.append('description', description);
+            submitFormData.append('price', price);
+            submitFormData.append('duration', duration);
+            submitFormData.append('vehicletype', vehicletype);
+            submitFormData.append('category', category);
+            submitFormData.append('status', status);
+            
+            // Only append image if a file is selected
+            const imageInput = document.getElementById('editImage');
+            if (imageInput.files && imageInput.files[0]) {
+                submitFormData.append('image', imageInput.files[0]);
+            }
+
+            try {
+                // Create a custom request for FormData
+                const token = getAuthToken();
+                if (!token) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'You are not authenticated. Please login again.'
+                    }).then(() => {
+                        window.location.href = '../login.html';
+                    });
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/admin/services/${servicenum}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                        // Don't set Content-Type - let browser set it with boundary for FormData
+                    },
+                    body: submitFormData
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch (e) {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                }
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Service updated successfully'
+                    }).then(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editServiceModal'));
+                        modal.hide();
+                        loadServices();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: result.message || 'Failed to update service'
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating service:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to update service: ' + (error.message || 'Unknown error')
+                });
+            }
+        }
+
+        // Archive service
+        async function archiveService(servicenum) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "This service will be archived (set to INACTIVE).",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, archive it!'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const { response, data } = await apiRequest(`/admin/services/${servicenum}/archive`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Archived!',
+                            text: 'Service has been archived successfully'
+                        }).then(() => {
+                            loadServices();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message || 'Failed to archive service'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error archiving service:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to archive service'
+                    });
+                }
+            }
+        }
+
+        // Restore service
+        async function restoreService(servicenum) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "This service will be restored (set to ACTIVE).",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, restore it!'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const { response, data } = await apiRequest(`/admin/services/${servicenum}/restore`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Restored!',
+                            text: 'Service has been restored successfully'
+                        }).then(() => {
+                            loadServices();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message || 'Failed to restore service'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error restoring service:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to restore service'
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

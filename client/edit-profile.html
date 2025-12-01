@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile - JoWash</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/client.css">
+  <style>
+    .password-toggle {
+      cursor: pointer;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      color: #6c757d;
+    }
+    .input-group {
+      position: relative;
+    }
+    .password-strength {
+      height: 5px;
+      margin-top: 5px;
+      background-color: #e9ecef;
+      border-radius: 3px;
+    }
+    .password-strength-meter {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease-in-out;
+    }
+    .password-feedback {
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .weak {
+      background-color: #dc3545;
+      width: 25%;
+    }
+    .medium {
+      background-color: #ffc107;
+      width: 50%;
+    }
+    .strong {
+      background-color: #28a745;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="client.html">
+        <img src="assets/images/tyre.png" alt="JoWash Logo" style="width: 40px;">
+        <span class="ms-2 fw-bold text-primary">JoWash</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="client.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#services">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#contact">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-primary" href="#" id="logoutBtn">Logout</a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <div class="profile-dropdown">
+              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li class="user-info p-3">
+                  <h6 class="mb-0" id="userName">Loading...</h6>
+                  <small class="text-muted" id="userEmail">Loading...</small>
+                </li>
+                <li><a class="dropdown-item active" href="edit-profile.html"><i class="fas fa-user-edit me-2"></i> Edit Profile</a></li>
+                <li><a class="dropdown-item" href="my-bookings.html"><i class="fas fa-calendar-check me-2"></i> My Bookings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutDropdownBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="container mt-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="client.html">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Profile Section -->
+  <section class="profile-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="info-card mb-4">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-info-circle text-primary me-3 fs-4"></i>
+              <p class="mb-0">Keep your profile information up to date to ensure smooth communications and service delivery.</p>
+            </div>
+          </div>
+          
+          <div class="card shadow">
+            <div class="card-header">
+              <h3><i class="fas fa-user-edit me-2"></i>Edit Your Profile</h3>
+            </div>
+            <div class="card-body">
+              <form id="profileForm">
+                <div class="row">
+                  <div class="col-md-4 mb-4">
+                    <div class="profile-image-container text-center">
+                      <img src="profile/default.jpg" alt="Profile Picture" class="profile-picture" id="profilePicture" onerror="this.src='profile/default.jpg'">
+                      <label for="profile_pic" class="photo-upload-btn">
+                        <i class="fas fa-camera"></i>
+                      </label>
+                      <input type="file" id="profile_pic" name="profilepic" class="d-none" accept="image/*">
+                      <p class="text-muted small mt-2">Click on the camera icon to change your profile picture</p>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <h4 class="section-title">Account Information</h4>
+                    <div class="row g-3 mb-4">
+                      <div class="col-md-4">
+                        <label for="userid" class="form-label">User ID</label>
+                        <input type="text" class="form-control" id="userid" name="userid" readonly>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="usertype" class="form-label">User Type</label>
+                        <input type="text" class="form-control" id="usertype" value="CUSTOMER" readonly>
+                      </div>
+                    
+                    <h4 class="section-title mt-4">Personal Information</h4>
+                    <div class="row g-3">
+                      <div class="col-md-5">
+                        <label for="fname" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="fname" name="fname" required>
+                      </div>
+                      <div class="col-md-2">
+                        <label for="minnitial" class="form-label">M.I.</label>
+                        <input type="text" class="form-control" id="minnitial" name="minnitial" maxlength="1">
+                      </div>
+                      <div class="col-md-5">
+                        <label for="lname" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lname" name="lname" required>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                          <input type="email" class="form-control" id="email" name="email" readonly>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="contact" class="form-label">Contact Number</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                          <input type="text" class="form-control" id="contact" name="contact" required>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="birthdate" class="form-label">Birthdate</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                          <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h4 class="section-title">Address Information</h4>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="street" class="form-label">Street Address</label>
+                    <input type="text" class="form-control" id="street" name="street" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="barangay" class="form-label">Barangay</label>
+                    <input type="text" class="form-control" id="barangay" name="barangay" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="province" class="form-label">Province</label>
+                    <input type="text" class="form-control" id="province" name="province" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="postalcode" class="form-label">Postal Code</label>
+                    <input type="text" class="form-control" id="postalcode" name="postalcode" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="country" class="form-label">Country</label>
+                    <input type="text" class="form-control" id="country" name="country" required>
+                  </div>
+                </div>
+                
+                <hr class="my-4">
+
+                <h4 class="section-title">Password Management</h4>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="current_password" class="form-label">Current Password</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                      <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Enter current password to verify" required>
+                      <span class="password-toggle" onclick="togglePassword('current_password')">
+                        <i class="fas fa-eye"></i>
+                      </span>
+                    </div>
+                    <div class="form-text">Required to save any changes to your profile</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="new_password" class="form-label">New Password</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-key"></i></span>
+                      <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Leave blank to keep current password" onkeyup="checkPasswordStrength()">
+                      <span class="password-toggle" onclick="togglePassword('new_password')">
+                        <i class="fas fa-eye"></i>
+                      </span>
+                    </div>
+                    <div class="password-strength">
+                      <div class="password-strength-meter" id="password-strength-meter"></div>
+                    </div>
+                    <div class="password-feedback" id="password-feedback"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                      <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your new password" onkeyup="checkPasswordMatch()">
+                      <span class="password-toggle" onclick="togglePassword('confirm_password')">
+                        <i class="fas fa-eye"></i>
+                      </span>
+                    </div>
+                    <div class="form-text" id="password-match-message"></div>
+                  </div>
+                </div>
+                
+                <div class="mt-4 d-flex justify-content-between">
+                  <a href="client.html" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                  </a>
+                  <div>
+                    <button type="reset" class="btn btn-outline-secondary me-2">
+                      <i class="fas fa-undo me-2"></i>Reset Changes
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="save-button">
+                      <i class="fas fa-save me-2"></i>Save Profile
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <!-- Footer -->
+ <footer>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+        <img src="assets/images/tyre.png" alt="JoWash Logo" class="img-fluid mb-4" style="width: 100px;">
+
+          <p>JoWash provides professional car wash services with state-of-the-art equipment and eco-friendly products. Book your appointment online for a quick and efficient service.</p>
+          <div class="social-links mt-4">
+          <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+<a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+<a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+<a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2 footer-links">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="client.html">Home</a></li>
+            <li><a href="client.html#services">Services</a></li>
+            <li><a href="client.html#about">About Us</a></li>
+            <li><a href="client.html#contact">Contact</a></li>
+            <li><a href="#" id="footerLogoutBtn">Logout</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 footer-links">
+          <h5>Our Services</h5>
+          <ul id="footerServices">
+            <!-- Services will be loaded dynamically -->
+          </ul>
+        </div>
+        <div class="col-lg-3 footer-links">
+          <h5>Working Hours</h5>
+          <ul>
+            <li>Monday - Friday: 8:00 AM - 7:00 PM</li>
+            <li>Saturday: 8:00 AM - 5:00 PM</li>
+            <li>Sunday: Closed</li>
+          </ul>
+          <h5 class="mt-4">Contact</h5>
+          <p>(123) 456-7890<br>info@jowash.com</p>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 JoWash. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+  <!-- Back to top button -->
+  <a href="#" class="btn btn-primary back-to-top position-fixed bottom-0 end-0 m-4" role="button" id="backToTopBtn" style="display: none;">
+    <i class="fas fa-arrow-up"></i>
+  </a>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- AOS Animation Library -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  
+  <!-- API Utility -->
+  <script src="../js/api.js"></script>
+  
+  <script>
+    // Initialize AOS
+    AOS.init();
+    
+    // Check authentication
+    if (!isAuthenticated()) {
+      window.location.href = '../login.html';
+    }
+
+    const userInfo = getUserInfo();
+    if (!userInfo || userInfo.usertype !== 'CLIENT') {
+      window.location.href = '../login.html';
+    }
+
+    // Load user info for navigation
+    async function loadUserInfo() {
+      try {
+        const { response, data } = await apiRequest('/client/user-info');
+        if (data.success && data.user) {
+          const user = data.user;
+          document.getElementById('userName').textContent = `${user.fname} ${user.lname}`;
+          document.getElementById('userEmail').textContent = user.email;
+          
+          let profilePicPath = user.profilepic || 'profile/default.jpg';
+          if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+            if (!profilePicPath.startsWith('profile/')) {
+              profilePicPath = 'profile/' + profilePicPath;
+            }
+          }
+          document.getElementById('profilePic').src = profilePicPath;
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    // Load profile data
+    async function loadProfile() {
+      try {
+        const { response, data } = await apiRequest('/client/profile', {
+          method: 'GET'
+        });
+
+        if (data.success && data.profile) {
+          const profile = data.profile;
+          
+          // Populate form fields
+          document.getElementById('userid').value = profile.userid || '';
+          document.getElementById('username').value = profile.username || '';
+          document.getElementById('email').value = profile.email || '';
+          document.getElementById('fname').value = profile.fname || '';
+          document.getElementById('minnitial').value = profile.minnitial || '';
+          document.getElementById('lname').value = profile.lname || '';
+          document.getElementById('contact').value = profile.contact || '';
+          document.getElementById('birthdate').value = profile.birthdate || '';
+          document.getElementById('street').value = profile.street || '';
+          document.getElementById('barangay').value = profile.barangay || '';
+          document.getElementById('city').value = profile.city || '';
+          document.getElementById('province').value = profile.province || '';
+          document.getElementById('country').value = profile.country || '';
+          document.getElementById('postalcode').value = profile.postalcode || '';
+
+          // Update profile image
+          let profilePicPath = profile.profilepic || 'profile/default.jpg';
+          if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+            if (!profilePicPath.startsWith('profile/')) {
+              profilePicPath = 'profile/' + profilePicPath;
+            }
+          }
+          document.getElementById('profilePicture').src = profilePicPath;
+          document.getElementById('profilePic').src = profilePicPath;
+        } else {
+          console.error('Failed to load profile:', data.message || 'Unknown error');
+          if (response.status === 401 || response.status === 403) {
+            window.location.href = '../login.html';
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message || 'Failed to load profile',
+              icon: 'error'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to load profile. Please try again.',
+          icon: 'error'
+        });
+      }
+    }
+
+    // Profile picture preview
+    document.getElementById('profile_pic').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('profilePicture').src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Back to top button functionality
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.style.display = 'block';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+
+    backToTopBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    // Password toggle visibility
+    function togglePassword(fieldId) {
+      const passwordField = document.getElementById(fieldId);
+      const icon = passwordField.nextElementSibling.querySelector('i');
+      
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        passwordField.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    }
+    
+    // Password strength checker
+    function checkPasswordStrength() {
+      const password = document.getElementById('new_password').value;
+      const meter = document.getElementById('password-strength-meter');
+      const feedback = document.getElementById('password-feedback');
+      
+      // Reset the meter
+      meter.className = 'password-strength-meter';
+      
+      // Check password strength
+      if (password.length === 0) {
+        meter.style.width = '0';
+        feedback.textContent = '';
+        return;
+      }
+      
+      // Simple strength check
+      let strength = 0;
+      
+      // Length check
+      if (password.length >= 8) strength += 1;
+      
+      // Complexity checks
+      if (/[A-Z]/.test(password)) strength += 1;
+      if (/[0-9]/.test(password)) strength += 1;
+      if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+      
+      // Update the meter
+      if (strength <= 1) {
+        meter.className += ' weak';
+        feedback.textContent = 'Weak password';
+        feedback.style.color = '#dc3545';
+      } else if (strength <= 3) {
+        meter.className += ' medium';
+        feedback.textContent = 'Medium strength password';
+        feedback.style.color = '#ffc107';
+      } else {
+        meter.className += ' strong';
+        feedback.textContent = 'Strong password';
+        feedback.style.color = '#28a745';
+      }
+    }
+    
+    // Check if passwords match
+    function checkPasswordMatch() {
+      const password = document.getElementById('new_password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      const message = document.getElementById('password-match-message');
+      
+      if (confirmPassword.length === 0) {
+        message.textContent = '';
+        return;
+      }
+      
+      if (password === confirmPassword) {
+        message.textContent = 'Passwords match';
+        message.style.color = '#28a745';
+      } else {
+        message.textContent = 'Passwords do not match';
+        message.style.color = '#dc3545';
+      }
+    }
+    
+    // Handle form submission
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const currentPassword = document.getElementById('current_password').value;
+      const newPassword = document.getElementById('new_password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      
+      // Check if the current password is provided
+      if (currentPassword === '') {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Please enter your current password to save changes',
+          icon: 'error',
+          confirmButtonColor: '#007bff'
+        });
+        return;
+      }
+      
+      // If new password is provided, check if it matches confirmation
+      if (newPassword !== '' && newPassword !== confirmPassword) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'New password and confirmation do not match',
+          icon: 'error',
+          confirmButtonColor: '#007bff'
+        });
+        return;
+      }
+
+      // If new password is provided, check minimum length
+      if (newPassword !== '' && newPassword.length < 8) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Password must be at least 8 characters long',
+          icon: 'error',
+          confirmButtonColor: '#007bff'
+        });
+        return;
+      }
+
+      const submitBtn = document.getElementById('save-button');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+
+      try {
+        const token = getAuthToken();
+        const formData = new FormData(this);
+        
+        // Remove readonly fields from form data
+        formData.delete('userid');
+        formData.delete('email');
+        formData.delete('usertype');
+
+        // Use fetch directly for FormData (can't use apiRequest as it sets JSON Content-Type)
+        const response = await fetch(`${API_BASE_URL}/client/profile`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+            // Don't set Content-Type - let browser set it with boundary for FormData
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update profile image if new one was uploaded
+          if (data.profile && data.profile.profilepic) {
+            let profilePicPath = data.profile.profilepic;
+            if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+              if (!profilePicPath.startsWith('profile/')) {
+                profilePicPath = 'profile/' + profilePicPath;
+              }
+            }
+            document.getElementById('profilePicture').src = profilePicPath;
+            document.getElementById('profilePic').src = profilePicPath;
+          }
+          
+          Swal.fire({
+            title: 'Success!',
+            text: data.message || 'Profile updated successfully!',
+            icon: 'success',
+            confirmButtonColor: '#007bff'
+          }).then(() => {
+            // Reload profile to get updated data
+            loadProfile();
+            loadUserInfo();
+            // Clear password fields
+            document.getElementById('current_password').value = '';
+            document.getElementById('new_password').value = '';
+            document.getElementById('confirm_password').value = '';
+            document.getElementById('password-strength-meter').className = 'password-strength-meter';
+            document.getElementById('password-strength-meter').style.width = '0';
+            document.getElementById('password-feedback').textContent = '';
+            document.getElementById('password-match-message').textContent = '';
+          });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: data.message || 'Failed to update profile',
+            icon: 'error',
+            confirmButtonColor: '#007bff'
+          });
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'An error occurred while updating your profile. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#007bff'
+        });
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    // Logout handlers
+    async function handleLogout() {
+      try {
+        const token = getAuthToken();
+        if (token) {
+          await apiRequest('/logout', {
+            method: 'POST'
+          });
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+      } finally {
+        removeAuthToken();
+        window.location.href = '../login.html';
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    document.getElementById('logoutDropdownBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    const footerLogoutBtn = document.getElementById('footerLogoutBtn');
+    if (footerLogoutBtn) {
+      footerLogoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleLogout();
+      });
+    }
+
+    // Load services for footer
+    async function loadFooterServices() {
+      try {
+        const { response, data } = await apiRequest('/client/services');
+        if (data.success && data.services) {
+          const servicesList = document.getElementById('footerServices');
+          servicesList.innerHTML = '';
+          data.services.slice(0, 5).forEach(service => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `book-service.html?service=${service.servicenum}`;
+            a.textContent = service.name;
+            li.appendChild(a);
+            servicesList.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading services for footer:', error);
+      }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserInfo();
+      loadProfile();
+      loadFooterServices();
+    });
+  </script>
+</body>
+</html>
+

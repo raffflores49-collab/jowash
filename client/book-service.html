@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Service - JoWash</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/client.css">
+  <style>
+    .booking-section {
+      padding: 80px 0;
+      background-color: #f8f9fa;
+    }
+    
+    .booking-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .booking-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px;
+      position: relative;
+    }
+    
+    .booking-service-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .booking-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+    
+    .booking-step {
+      text-align: center;
+      position: relative;
+      width: 100%;
+    }
+    
+    .booking-step:not(:last-child):after {
+      content: '';
+      position: absolute;
+      top: 25px;
+      right: -50%;
+      width: 100%;
+      height: 2px;
+      background-color: #dee2e6;
+      z-index: 1;
+    }
+    
+    .booking-step.active:not(:last-child):after {
+      background-color: var(--primary-color);
+    }
+    
+    .step-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: white;
+      border: 2px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      position: relative;
+      z-index: 2;
+      font-size: 1.2rem;
+      color: #6c757d;
+    }
+    
+    .booking-step.active .step-icon {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+    
+    .booking-step.completed .step-icon {
+      background-color: #28a745;
+      border-color: #28a745;
+      color: white;
+    }
+    
+    .step-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-top: 5px;
+    }
+    
+    .staff-card {
+      border-radius: 10px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .staff-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .staff-card.selected {
+      border-color: var(--primary-color);
+    }
+    
+    .staff-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .date-card, .time-card {
+      border-radius: 10px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .date-card:hover:not(.disabled), .time-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .date-card.selected, .time-card.selected {
+      border-color: var(--primary-color);
+      background-color: rgba(var(--primary-rgb), 0.1);
+    }
+    
+    .date-card.disabled {
+      background-color: #f8f9fa;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .date-day {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    .date-date {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+    
+    .service-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .service-duration {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    
+    .booking-summary {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    
+    .summary-label {
+      color: #6c757d;
+    }
+    
+    .summary-value {
+      font-weight: 500;
+    }
+    
+    .total-row {
+      border-top: 1px solid #dee2e6;
+      padding-top: 15px;
+      margin-top: 15px;
+      font-weight: 700;
+    }
+    .date-navigation {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .date-grid {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .date-card {
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .date-day {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    .date-date {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="client.html">
+        <img src="assets/images/tyre.png" alt="JoWash Logo">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="client.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="client.html#services">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#contact">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-primary" href="#" id="logoutBtn">Logout</a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <div class="profile-dropdown">
+              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li class="user-info">
+                  <h6 class="mb-0" id="userName">Loading...</h6>
+                  <small class="text-muted" id="userEmail">Loading...</small>
+                </li>
+                <li><a class="dropdown-item" href="edit-profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                <li><a class="dropdown-item" href="my-bookings.html"><i class="fas fa-calendar-check"></i> My Bookings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutDropdownBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="home">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+          <h1 class="display-4 fw-bold mb-4">Book Your Car Wash</h1>
+          <p class="lead mb-4">Follow our simple booking process to schedule your premium car wash service.</p>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000">
+          <div class="lottie-container" id="car-wash-animation"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Section -->
+  <section class="booking-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card booking-card mb-4">
+            <div class="booking-header">
+              <h3 class="mb-0">Book Your Service</h3>
+              <p class="mb-0">Complete the steps below to book your appointment</p>
+            </div>
+            <div class="card-body p-4">
+              <!-- Booking Steps Progress -->
+              <div class="booking-steps">
+                <div class="booking-step" id="step1Indicator">
+                  <div class="step-icon">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="step-title">Select Staff</div>
+                </div>
+                <div class="booking-step" id="step2Indicator">
+                  <div class="step-icon">
+                    <i class="fas fa-calendar"></i>
+                  </div>
+                  <div class="step-title">Choose Date & Time</div>
+                </div>
+                <div class="booking-step" id="step3Indicator">
+                  <div class="step-icon">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div class="step-title">Confirmation</div>
+                </div>
+              </div>
+
+              <!-- Step 1: Select Staff -->
+              <div id="step1Content">
+                <h4 class="mb-4" id="staffRoleTitle">Select a Staff Member</h4>
+                <div class="row g-4" id="staffContainer">
+                  <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4 text-center">
+                  <button type="button" class="btn btn-primary btn-lg" id="nextToStep2" disabled>Next</button>
+                </div>
+              </div>
+
+              <!-- Step 2: Choose Date and Time -->
+              <div id="step2Content" style="display: none;">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="date-navigation mb-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <button class="btn btn-sm btn-outline-secondary me-1" id="prevMonthBtn">
+                            <i class="fas fa-angle-double-left"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-secondary" id="prevWeekBtn">
+                            <i class="fas fa-angle-left"></i>
+                          </button>
+                        </div>
+                        <h4 class="mb-0" id="currentMonthDisplay">Loading...</h4>
+                        <div>
+                          <button class="btn btn-sm btn-outline-secondary me-1" id="nextWeekBtn">
+                            <i class="fas fa-angle-right"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-secondary" id="nextMonthBtn">
+                            <i class="fas fa-angle-double-right"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="date-grid">
+                      <div class="row g-2" id="datesContainer">
+                        <!-- Dates will be loaded here -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="mb-3">Select Time</h4>
+                    <div class="row g-2" id="timeSlots">
+                      <div class="col-12">
+                        <div class="alert alert-info">
+                          Please select a date first to view available time slots.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4 text-center">
+                  <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="backToStep1">Back</button>
+                  <button type="button" class="btn btn-primary btn-lg" id="nextToStep3" disabled>Next</button>
+                </div>
+              </div>
+
+              <!-- Step 3: Confirmation -->
+              <div id="step3Content" style="display: none;">
+                <h4 class="mb-4">Booking Confirmation</h4>
+                <div class="alert alert-success">
+                  <i class="fas fa-info-circle me-2"></i>
+                  Please review your booking details before confirming.
+                </div>
+                
+                <div class="booking-summary" id="bookingSummary">
+                  <!-- Summary will be loaded here -->
+                </div>
+                
+                <div class="mt-4 text-center">
+                  <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="backToStep2">Back</button>
+                  <button type="button" class="btn btn-primary btn-lg" id="confirmBookingBtn">Confirm Booking</button>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4">
+          <div class="card booking-card">
+            <div class="card-body p-4">
+              <h4 class="mb-3">Service Details</h4>
+              <img src="" alt="Service" class="booking-service-img" id="serviceImage" onerror="this.src='assets/images/default.jpg'">
+              <h5 id="serviceName">Loading...</h5>
+              <p class="text-muted mb-3" id="serviceDescription">Loading...</p>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="service-price" id="servicePrice">Loading...</span>
+                <span class="service-duration" id="serviceDuration"><i class="far fa-clock me-1"></i>Loading...</span>
+              </div>
+              <div class="d-flex align-items-center mb-3">
+                <div class="badge bg-primary me-2" id="serviceCategory">Loading...</div>
+                <div class="badge bg-secondary" id="serviceVehicleType">Loading...</div>
+              </div>
+              <hr>
+              <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-shield-alt text-primary me-2"></i>
+                <p class="mb-0">Safe and secure booking</p>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-calendar-check text-primary me-2"></i>
+                <p class="mb-0">Easy rescheduling</p>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-hand-sparkles text-primary me-2"></i>
+                <p class="mb-0">Professional service</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <img src="assets/images/tyre.png" alt="JoWash Logo" class="img-fluid mb-4" style="width: 100px;">
+          <p>JoWash provides professional car wash services with state-of-the-art equipment and eco-friendly products. Book your appointment online for a quick and efficient service.</p>
+          <div class="social-links mt-4">
+            <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2 footer-links">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="client.html">Home</a></li>
+            <li><a href="client.html#services">Services</a></li>
+            <li><a href="client.html#about">About Us</a></li>
+            <li><a href="client.html#contact">Contact</a></li>
+            <li><a href="#" id="footerLogoutBtn">Logout</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 footer-links">
+          <h5>Our Services</h5>
+          <ul id="footerServices">
+            <!-- Services will be loaded here -->
+          </ul>
+        </div>
+        <div class="col-lg-3 footer-links">
+          <h5>Working Hours</h5>
+          <ul>
+            <li>Monday - Friday: 8:00 AM - 7:00 PM</li>
+            <li>Saturday: 8:00 AM - 5:00 PM</li>
+            <li>Sunday: Closed</li>
+          </ul>
+          <h5 class="mt-4">Contact</h5>
+          <p>(123) 456-7890<br>info@jowash.com</p>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 JoWash. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <a href="#" class="btn btn-primary back-to-top position-fixed bottom-0 end-0 m-4" role="button" id="backToTopBtn">
+    <i class="fas fa-arrow-up"></i>
+  </a>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- AOS Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  
+  <!-- Lottie Player -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.14/lottie.min.js"></script>
+  
+  <!-- API Utility -->
+  <script src="../js/api.js"></script>
+  
+  <script>
+    // Check authentication
+    if (!isAuthenticated() || getUserInfo().usertype !== 'CLIENT') {
+      window.location.href = '../login.html';
+    }
+
+    // Initialize AOS
+    AOS.init();
+    
+    // Load Lottie Animations
+    document.addEventListener('DOMContentLoaded', function() {
+      const carWashAnimation = lottie.loadAnimation({
+        container: document.getElementById('car-wash-animation'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'https://lottie.host/4f64c12a-13b5-4199-99f1-0106fc558925/adDoQzeQMe.json'
+      });
+
+      // Load user info
+      loadUserInfo();
+      
+      // Get service ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const serviceId = urlParams.get('service');
+      const step = parseInt(urlParams.get('step') || '1');
+      const staffId = urlParams.get('staff');
+      const date = urlParams.get('date');
+      const time = urlParams.get('time');
+      const startDate = urlParams.get('start_date');
+      
+      if (!serviceId) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Service ID is required',
+          icon: 'error',
+          confirmButtonColor: '#0d6efd'
+        }).then(() => {
+          window.location.href = 'client.html#services';
+        });
+        return;
+      }
+      
+      // Load service details
+      loadService(serviceId).then(() => {
+        // Load appropriate step based on URL
+        if (step === 1) {
+          showStep1(serviceId);
+        } else if (step === 2 && staffId) {
+          // Use start_date from URL if provided, otherwise use current date
+          const dateToUse = startDate || date || new Date().toISOString().split('T')[0];
+          showStep2(serviceId, staffId, date, dateToUse);
+        } else if (step === 3 && staffId && date && time) {
+          showStep3(serviceId, staffId, date, time);
+        } else {
+          showStep1(serviceId);
+        }
+      });
+    });
+
+    // Global variables
+    let currentService = null;
+    let selectedStaffId = null;
+    let selectedDate = null;
+    let selectedTime = null;
+    // Bookings start from tomorrow, so default to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    let currentStartDate = tomorrow.toISOString().split('T')[0];
+    let bookedSlots = {};
+    let availableDates = [];
+    let dateNavigation = {};
+
+    // Load user information
+    async function loadUserInfo() {
+      try {
+        const { response, data } = await apiRequest('/client/user-info');
+        
+        if (data.success && data.user) {
+          document.getElementById('userName').textContent = `${data.user.fname} ${data.user.lname}`;
+          document.getElementById('userEmail').textContent = data.user.email;
+          
+          const profilePic = document.getElementById('profilePic');
+          if (data.user.profilepic) {
+            profilePic.src = `profile/${data.user.profilepic.split('/').pop()}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    // Load service details
+    async function loadService(serviceId) {
+      try {
+        const { response, data } = await apiRequest(`/client/services/${serviceId}`);
+        
+        if (data.success && data.service) {
+          currentService = data.service;
+          
+          // Update service details sidebar
+          document.getElementById('serviceName').textContent = data.service.name;
+          document.getElementById('serviceDescription').textContent = data.service.description;
+          document.getElementById('servicePrice').textContent = `₱${parseFloat(data.service.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('serviceDuration').innerHTML = `<i class="far fa-clock me-1"></i>${data.service.duration} mins`;
+          document.getElementById('serviceCategory').textContent = data.service.category;
+          document.getElementById('serviceVehicleType').textContent = data.service.vehicletype;
+          
+          // Set service image
+          let imageSrc = data.service.image || 'service/default.jpg';
+          if (imageSrc && !imageSrc.startsWith('http')) {
+            imageSrc = `http://127.0.0.1:8000/${imageSrc}`;
+          }
+          document.getElementById('serviceImage').src = imageSrc;
+        } else {
+          throw new Error('Service not found');
+        }
+      } catch (error) {
+        console.error('Error loading service:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Service not found',
+          icon: 'error',
+          confirmButtonColor: '#0d6efd'
+        }).then(() => {
+          window.location.href = 'client.html#services';
+        });
+      }
+    }
+
+    // Show Step 1: Select Staff
+    async function showStep1(serviceId) {
+      updateStepIndicator(1);
+      document.getElementById('step1Content').style.display = 'block';
+      document.getElementById('step2Content').style.display = 'none';
+      document.getElementById('step3Content').style.display = 'none';
+      
+      if (!currentService) {
+        await loadService(serviceId);
+      }
+      
+      // Determine staff role based on service category
+      const staffRole = currentService.category === 'DETAILING' ? 'DETAILER' : 'WASHER';
+      document.getElementById('staffRoleTitle').textContent = `Select a ${staffRole}`;
+      
+      try {
+        const { response, data } = await apiRequest(`/client/services/${serviceId}/staff`);
+        
+        if (data.success && data.staff) {
+          const staffContainer = document.getElementById('staffContainer');
+          
+          if (data.staff.length === 0) {
+            staffContainer.innerHTML = `
+              <div class="col-12">
+                <div class="alert alert-warning">
+                  No available staff found for this service. Please try again later or contact us.
+                </div>
+              </div>
+            `;
+            return;
+          }
+          
+          let staffHTML = '';
+          data.staff.forEach(staff => {
+            const profilePic = staff.profilepic ? `../staff/profile/${staff.profilepic.split('/').pop()}` : '../staff/profile/default.jpg';
+            const shiftStart = formatTime(staff.shiftstart);
+            const shiftEnd = formatTime(staff.shiftend);
+            
+            staffHTML += `
+              <div class="col-md-6">
+                <div class="card staff-card p-3" onclick="selectStaff(${staff.staffid})" id="staff-${staff.staffid}">
+                  <div class="d-flex align-items-center">
+                    <img src="${profilePic}" alt="${staff.fname} ${staff.lname}" class="staff-img me-3" onerror="this.src='../staff/profile/default.jpg'">
+                    <div>
+                      <h5 class="mb-1">${staff.fname} ${staff.lname}</h5>
+                      <p class="mb-0 text-muted">${staff.role}</p>
+                      <p class="mb-0 small">
+                        <i class="far fa-clock me-1"></i>
+                        ${shiftStart} - ${shiftEnd}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          
+          staffContainer.innerHTML = staffHTML;
+        }
+      } catch (error) {
+        console.error('Error loading staff:', error);
+        document.getElementById('staffContainer').innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-danger">
+              Error loading staff. Please try again.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Select staff function
+    function selectStaff(staffId) {
+      // Remove selected class from all staff cards
+      document.querySelectorAll('.staff-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to the clicked staff card
+      document.getElementById('staff-' + staffId).classList.add('selected');
+      
+      // Enable next button
+      document.getElementById('nextToStep2').removeAttribute('disabled');
+      
+      // Store selected staff id
+      selectedStaffId = staffId;
+      
+      // Update button click handler - use URL navigation like original
+      const nextBtn = document.getElementById('nextToStep2');
+      nextBtn.onclick = () => {
+        window.location.href = `book-service.html?service=${currentService.servicenum}&step=2&staff=${staffId}`;
+      };
+    }
+
+    // Show Step 2: Choose Date and Time
+    async function showStep2(serviceId, staffId, preSelectedDate = null, startDateForNav = null) {
+      updateStepIndicator(2);
+      document.getElementById('step1Content').style.display = 'none';
+      document.getElementById('step2Content').style.display = 'block';
+      document.getElementById('step3Content').style.display = 'none';
+      
+      selectedStaffId = staffId;
+      
+      // Use start_date from navigation if provided, otherwise use current date
+      const startDateToUse = startDateForNav || currentStartDate;
+      currentStartDate = startDateToUse;
+      
+      // Load available dates and booked slots
+      await loadAvailableDates(startDateToUse);
+      await loadBookedSlots(staffId);
+      
+      // If date was pre-selected, select it
+      if (preSelectedDate) {
+        setTimeout(() => {
+          selectDate(preSelectedDate);
+        }, 100);
+      }
+    }
+
+    // Load available dates
+    async function loadAvailableDates(startDate) {
+      try {
+        const { response, data } = await apiRequest(`/client/available-dates?start_date=${startDate}`);
+        
+        if (data.success) {
+          availableDates = data.dates;
+          dateNavigation = data.navigation;
+          
+          // Update month display
+          document.getElementById('currentMonthDisplay').textContent = dateNavigation.current_month;
+          
+          // Update navigation buttons
+          document.getElementById('prevMonthBtn').onclick = () => navigateDate(dateNavigation.prev_month);
+          document.getElementById('prevWeekBtn').onclick = () => navigateDate(dateNavigation.prev_week);
+          document.getElementById('nextWeekBtn').onclick = () => navigateDate(dateNavigation.next_week);
+          document.getElementById('nextMonthBtn').onclick = () => navigateDate(dateNavigation.next_month);
+          
+          // Render dates
+          renderDates();
+        }
+      } catch (error) {
+        console.error('Error loading available dates:', error);
+      }
+    }
+
+    // Render dates
+    function renderDates() {
+      const datesContainer = document.getElementById('datesContainer');
+      let datesHTML = '';
+      
+      availableDates.forEach(date => {
+        const dayShort = date.day.substring(0, 3);
+        const disabledClass = date.is_past ? 'disabled' : '';
+        const onclickAttr = date.is_past ? '' : `onclick="selectDate('${date.date}')"`;
+        
+        datesHTML += `
+          <div class="col-3">
+            <div class="card date-card p-2 text-center ${disabledClass}" ${onclickAttr} id="date-${date.date}">
+              <p class="date-day mb-0">${dayShort}</p>
+              <p class="date-date mb-0">${date.day_num}</p>
+            </div>
+          </div>
+        `;
+      });
+      
+      datesContainer.innerHTML = datesHTML;
+    }
+
+    // Load booked slots for staff
+    async function loadBookedSlots(staffId) {
+      try {
+        const { response, data } = await apiRequest(`/client/staff/${staffId}/booked-slots`);
+        
+        if (data.success) {
+          bookedSlots = data.booked_slots;
+        }
+      } catch (error) {
+        console.error('Error loading booked slots:', error);
+        bookedSlots = {};
+      }
+    }
+
+    // Navigate dates - preserve URL parameters like original
+    function navigateDate(newDate) {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('start_date', newDate);
+      urlParams.set('step', '2');
+      urlParams.set('service', currentService.servicenum);
+      if (selectedStaffId) {
+        urlParams.set('staff', selectedStaffId);
+      }
+      window.location.href = `book-service.html?${urlParams.toString()}`;
+    }
+
+    // Select date
+    async function selectDate(date) {
+      // Remove selected class from all date cards
+      document.querySelectorAll('.date-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to the clicked date card
+      const dateCard = document.getElementById('date-' + date);
+      if (dateCard && !dateCard.classList.contains('disabled')) {
+        dateCard.classList.add('selected');
+        selectedDate = date;
+        
+        // Load time slots for the selected date
+        await loadTimeSlots(date);
+      }
+    }
+
+    // Load time slots for selected date
+    async function loadTimeSlots(date) {
+      if (!selectedStaffId || !date || !currentService) return;
+      
+      try {
+        const { response, data } = await apiRequest(`/client/staff/${selectedStaffId}/time-slots?date=${date}&servicenum=${currentService.servicenum}`);
+        
+        if (data.success && data.slots) {
+          const timeSlotsContainer = document.getElementById('timeSlots');
+          timeSlotsContainer.innerHTML = '';
+          
+          let hasAvailableSlots = false;
+          
+          // Since bookings can only start from tomorrow, all slots are available
+          data.slots.forEach(slot => {
+            hasAvailableSlots = true;
+            const timeCard = document.createElement('div');
+            timeCard.className = 'col-6';
+            timeCard.innerHTML = `
+              <div class="card time-card p-3 text-center" onclick="selectTime('${slot.start}')" id="time-${slot.start.replace(/:/g, '-')}">
+                <p class="mb-0">${slot.display}</p>
+              </div>
+            `;
+            timeSlotsContainer.appendChild(timeCard);
+          });
+          
+          // Show message if no slots available
+          if (!hasAvailableSlots) {
+            timeSlotsContainer.innerHTML = `
+              <div class="col-12">
+                <div class="alert alert-warning">
+                  No available time slots for this date. Please select another date.
+                </div>
+              </div>
+            `;
+          }
+          
+          // Reset selected time
+          selectedTime = null;
+          checkStep2Completion();
+        }
+      } catch (error) {
+        console.error('Error loading time slots:', error);
+        document.getElementById('timeSlots').innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-danger">
+              Error loading time slots. Please try again.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Select time
+    function selectTime(time) {
+      // Remove selected class from all time cards
+      document.querySelectorAll('.time-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to the clicked time card
+      const timeCard = document.getElementById('time-' + time.replace(/:/g, '-'));
+      if (timeCard) {
+        timeCard.classList.add('selected');
+        selectedTime = time;
+        checkStep2Completion();
+      }
+    }
+
+    // Check step 2 completion
+    function checkStep2Completion() {
+      const nextButton = document.getElementById('nextToStep3');
+      
+      if (selectedDate && selectedTime) {
+        nextButton.removeAttribute('disabled');
+        nextButton.onclick = () => {
+          window.location.href = `book-service.html?service=${currentService.servicenum}&step=3&staff=${selectedStaffId}&date=${selectedDate}&time=${selectedTime}`;
+        };
+      } else {
+        nextButton.setAttribute('disabled', 'disabled');
+      }
+    }
+
+    // Show Step 3: Confirmation
+    async function showStep3(serviceId, staffId, date, time) {
+      updateStepIndicator(3);
+      document.getElementById('step1Content').style.display = 'none';
+      document.getElementById('step2Content').style.display = 'none';
+      document.getElementById('step3Content').style.display = 'block';
+      
+      selectedStaffId = staffId;
+      selectedDate = date;
+      selectedTime = time;
+      
+      // Load staff details
+      try {
+        const { response: staffResponse, data: staffData } = await apiRequest(`/client/services/${serviceId}/staff`);
+        
+        if (staffData.success && staffData.staff) {
+          const staff = staffData.staff.find(s => s.staffid == staffId);
+          
+          if (staff && currentService) {
+            // Calculate end time
+            const startTimeObj = new Date(`2000-01-01T${time}`);
+            const endTimeObj = new Date(startTimeObj.getTime() + (currentService.duration * 60000));
+            const endTime = formatTime(endTimeObj.toTimeString().substring(0, 5));
+            const startTimeFormatted = formatTime(time);
+            
+            // Format date
+            const dateObj = new Date(date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // Build summary
+            const summaryHTML = `
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="summary-item">
+                    <span class="summary-label">Service:</span>
+                    <span class="summary-value">${currentService.name}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Staff:</span>
+                    <span class="summary-value">${staff.fname} ${staff.lname}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Date:</span>
+                    <span class="summary-value">${formattedDate}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Time:</span>
+                    <span class="summary-value">${startTimeFormatted} - ${endTime}</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="summary-item">
+                    <span class="summary-label">Vehicle Type:</span>
+                    <span class="summary-value">${currentService.vehicletype}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Duration:</span>
+                    <span class="summary-value">${currentService.duration} minutes</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Category:</span>
+                    <span class="summary-value">${currentService.category}</span>
+                  </div>
+                  <div class="summary-item total-row">
+                    <span class="summary-label">Total:</span>
+                    <span class="summary-value">₱${parseFloat(currentService.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            document.getElementById('bookingSummary').innerHTML = summaryHTML;
+            
+            // Set up back and confirm buttons
+            document.getElementById('backToStep2').onclick = () => {
+              window.location.href = `book-service.html?service=${serviceId}&step=2&staff=${staffId}`;
+            };
+            
+            document.getElementById('confirmBookingBtn').onclick = () => {
+              confirmBooking(serviceId, staffId, date, time);
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Error loading staff details:', error);
+      }
+    }
+
+    // Confirm booking
+    async function confirmBooking(serviceId, staffId, date, time) {
+      try {
+        const { response, data } = await apiRequest('/client/bookings', {
+          method: 'POST',
+          body: JSON.stringify({
+            staffid: parseInt(staffId),
+            servicenum: parseInt(serviceId),
+            date: date,
+            time: time
+          })
+        });
+        
+        if (data.success) {
+          await Swal.fire({
+            title: 'Success!',
+            text: data.message || 'Booking confirmed successfully!',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd'
+          });
+          
+          window.location.href = 'my-bookings.html';
+        } else {
+          throw new Error(data.message || 'Failed to create booking');
+        }
+      } catch (error) {
+        console.error('Error creating booking:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: error.message || 'Error processing booking. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#0d6efd'
+        });
+      }
+    }
+
+    // Update step indicator
+    function updateStepIndicator(currentStep) {
+      // Reset all steps
+      for (let i = 1; i <= 3; i++) {
+        const stepIndicator = document.getElementById(`step${i}Indicator`);
+        const stepIcon = stepIndicator.querySelector('.step-icon');
+        stepIndicator.classList.remove('active', 'completed');
+        
+        if (i < currentStep) {
+          stepIndicator.classList.add('completed');
+          stepIcon.innerHTML = '<i class="fas fa-check"></i>';
+        } else if (i === currentStep) {
+          stepIndicator.classList.add('active');
+          if (i === 1) {
+            stepIcon.innerHTML = '<i class="fas fa-user"></i>';
+          } else if (i === 2) {
+            stepIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+          } else {
+            stepIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+          }
+        } else {
+          if (i === 1) {
+            stepIcon.innerHTML = '<i class="fas fa-user"></i>';
+          } else if (i === 2) {
+            stepIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+          } else {
+            stepIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+          }
+        }
+      }
+    }
+
+    // Format time helper
+    function formatTime(timeString) {
+      if (!timeString) return '';
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minutes} ${ampm}`;
+    }
+
+    // Back to step 1
+    document.getElementById('backToStep1').onclick = () => {
+      window.location.href = `book-service.html?service=${currentService.servicenum}&step=1`;
+    };
+
+    // Logout functionality
+    async function handleLogout() {
+      try {
+        await logout();
+        window.location.href = '../login.html';
+      } catch (error) {
+        console.error('Logout error:', error);
+        removeAuthToken();
+        window.location.href = '../login.html';
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    document.getElementById('logoutDropdownBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    document.getElementById('footerLogoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    // Back to top button
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.style.display = 'block';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+
+    backToTopBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  </script>
+</body>
+</html>
+

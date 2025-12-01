@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <title>Verify Activation Code</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.1.0/esm/ionicons.min.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .page-container {
+            display: flex;
+            width: 900px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .animation-container {
+            flex: 1;
+            background-color: #e6f7ff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .road-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .verify-container {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #4a96e6;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        h2 {
+            color: #2273d3;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .info-message {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .code-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .code-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f0f8ff;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #2273d3;
+            box-shadow: 0 0 10px rgba(34, 115, 211, 0.2);
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: none;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2273d3;
+            box-shadow: 0 0 10px rgba(34, 115, 211, 0.2);
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #2273d3;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2273d3, #4a96e6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #1b5db0, #3880d0);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(34, 115, 211, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .links a {
+            color: #2273d3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .links a:hover {
+            color: #1b5db0;
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .verify-container > * {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .verify-container h2 {
+            animation-delay: 0.2s;
+        }
+
+        .verify-container .info-message {
+            animation-delay: 0.3s;
+        }
+
+        .verify-container .code-input-container {
+            animation-delay: 0.4s;
+        }
+
+        .verify-container .btn-submit {
+            animation-delay: 0.5s;
+        }
+
+        .verify-container .links {
+            animation-delay: 0.6s;
+        }
+
+        @media (max-width: 768px) {
+            .page-container {
+                flex-direction: column;
+                width: 100%;
+                height: auto;
+                border-radius: 0;
+            }
+
+            .animation-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="animation-container">
+            <div id="road-animation" class="road-bg"></div>
+        </div>
+        
+        <div class="verify-container">
+            <a href="login.html" class="close-btn">&times;</a>
+            <h2>Verify Activation Code</h2>
+            <div class="info-message">
+                Please enter the 6-digit code sent to your email address.
+            </div>
+            
+            <form id="verifyActivationForm">
+                <div class="code-input-container">
+                    <input type="text" class="code-input" maxlength="1" id="code1" required>
+                    <input type="text" class="code-input" maxlength="1" id="code2" required>
+                    <input type="text" class="code-input" maxlength="1" id="code3" required>
+                    <input type="text" class="code-input" maxlength="1" id="code4" required>
+                    <input type="text" class="code-input" maxlength="1" id="code5" required>
+                    <input type="text" class="code-input" maxlength="1" id="code6" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" class="form-control" placeholder="Email" id="email" name="email" required>
+                    <span class="form-icon">
+                        <ion-icon name="mail-outline"></ion-icon>
+                    </span>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Verify Code</button>
+
+                <div class="links">
+                    <a href="login.html">Back to Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+        // Load the road animation
+        document.addEventListener('DOMContentLoaded', function() {
+            lottie.loadAnimation({
+                container: document.getElementById('road-animation'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://lottie.host/820808c4-6547-4b7d-9daf-6eb4b33d68c3/eSvsQEJUXb.json'
+            });
+
+            // Get email from localStorage if available
+            const storedEmail = localStorage.getItem('activation_email');
+            if (storedEmail) {
+                document.getElementById('email').value = storedEmail;
+            }
+
+            // Setup code input navigation
+            const codeInputs = document.querySelectorAll('.code-input');
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    if (e.target.value.length === 1 && index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+
+                // Only allow numbers
+                input.addEventListener('keypress', function(e) {
+                    if (!/[0-9]/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+
+        // Handle form submission
+        document.getElementById('verifyActivationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const codeInputs = document.querySelectorAll('.code-input');
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+            const email = document.getElementById('email').value;
+
+            if (code.length !== 6) {
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Please enter the complete 6-digit code.',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifying...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/verify-activation-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email, code: code })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success'
+                    });
+
+                    // Clear stored email
+                    localStorage.removeItem('activation_email');
+
+                    // Redirect to login page
+                    window.location.href = 'login.html';
+                } else {
+                    await Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'error'
+                    });
+
+                    // Clear code inputs
+                    codeInputs.forEach(input => input.value = '');
+                    codeInputs[0].focus();
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. Please try again later.',
+                });
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Verify Code';
+            }
+        });
+    </script>
+</body>
+</html>
+

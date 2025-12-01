@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="JoWash Admin Dashboard - Professional Car Wash Management System">
+    <meta name="author" content="JoWash">
+    <meta name="theme-color" content="#0061f2">
+
+    <title>JoWash | Staff Management</title>
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="ts-main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2>Jo<span>Wash</span></h2>
+            </div>
+            
+            <div class="profile-section">
+                <a href="edit-profile.html">
+                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='profile/default.jpg'">
+                </a>
+                <h5 class="profile-name" id="adminName">Loading...</h5>
+                <div class="profile-role">Administrator</div>
+            </div>
+            
+            <div class="sidebar-menu-header">MAIN NAVIGATION</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin.html">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="accounts.html">
+                        <i class="bi bi-people"></i> Accounts
+                    </a>
+                </li>
+                <li>
+                    <a href="services.html">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
+                </li>
+                <li>
+                    <a href="staff.html" class="active">
+                        <i class="bi bi-person-badge"></i> Staff
+                    </a>
+                </li>
+                <li>
+                    <a href="bookings.html">
+                        <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-menu-header"></div>
+            
+            <div class="logout-link">
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </div>
+                    <h4 class="header-title">Staff Management</h4>
+                </div>
+                <div class="header-actions">
+                    <div class="header-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Section -->
+            <div class="container-fluid">
+                <!-- Welcome Section -->
+                <div class="dashboard-welcome">
+                    <h2 class="welcome-title">Welcome back, <span id="welcomeName">Admin</span>!</h2>
+                    <p class="welcome-subtitle">Manage your staff and their schedules.</p>
+                </div>
+                
+                <!-- Staff Table Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">Staff Records</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="search-box me-3">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Search staff...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Staff ID</th>
+                                        <th>User ID</th>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Shift Start</th>
+                                        <th>Shift End</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTable">
+                                    <tr>
+                                        <td colspan="8" class="text-center">Loading staff...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-rounded justify-content-center" id="pagination">
+                                </ul>
+                            </nav>
+                            <div class="text-center mt-2">
+                                <small class="text-muted" id="paginationInfo">Loading...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Staff Modal -->
+    <div class="modal fade" id="editStaffModal" tabindex="-1" aria-labelledby="editStaffModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editStaffModalLabel">
+                        <i class="bi bi-gear me-2"></i>Set Staff Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStaffForm">
+                        <input type="hidden" id="editStaffid" name="staffid">
+                        <input type="hidden" id="editUserid" name="userid">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control" id="editUsername" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editRole" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editRole" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="WASHER">WASHER</option>
+                                <option value="DETAILER">DETAILER</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editStatus" name="status" required>
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="INACTIVE">INACTIVE</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editShiftStart" class="form-label fw-bold">Shift Start <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" id="editShiftStart" name="shiftstart" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editShiftEnd" class="form-label fw-bold">Shift End <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" id="editShiftEnd" name="shiftend" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitEditStaff">
+                        <i class="bi bi-check-circle"></i> Update Staff
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        // API_BASE_URL is already defined in api.js
+        let currentPage = 1;
+        let currentSearch = '';
+        let totalPages = 1;
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = getAuthToken();
+            const userType = localStorage.getItem('user_type');
+
+            if (!token || userType !== 'ADMIN') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+
+            // Load user info and staff
+            loadUserInfo();
+            loadStaff();
+
+            // Sidebar toggle
+            document.querySelector('.menu-toggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+            });
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const token = getAuthToken();
+                    if (token) {
+                        await apiRequest('/logout', { method: 'POST' });
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    removeAuthToken();
+                    window.location.href = '../login.html';
+                }
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    currentSearch = this.value.trim();
+                    currentPage = 1;
+                    loadStaff();
+                }
+            });
+
+            // Edit staff form handler
+            document.getElementById('submitEditStaff').addEventListener('click', async function() {
+                await handleEditStaff();
+            });
+
+            // Reset edit form when modal is closed
+            document.getElementById('editStaffModal').addEventListener('hidden.bs.modal', function() {
+                document.getElementById('editStaffForm').reset();
+            });
+        });
+
+        // Load user information
+        async function loadUserInfo() {
+            try {
+                const { response, data } = await apiRequest('/admin/user-info');
+
+                if (data && data.success && data.user) {
+                    const user = data.user;
+                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
+                    
+                    if (document.getElementById('adminName')) {
+                        document.getElementById('adminName').textContent = fullName;
+                    }
+                    if (document.getElementById('welcomeName')) {
+                        document.getElementById('welcomeName').textContent = fullName;
+                    }
+                    
+                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    if (!profilePicPath.startsWith('profile/') && !profilePicPath.startsWith('http')) {
+                        profilePicPath = 'profile/' + profilePicPath;
+                    }
+                    if (document.getElementById('profilePic')) {
+                        document.getElementById('profilePic').src = profilePicPath;
+                    }
+                } else {
+                    if (response && (response.status === 401 || response.status === 403)) {
+                        window.location.href = '../login.html';
+                        return;
+                    }
+                    if (document.getElementById('adminName')) {
+                        document.getElementById('adminName').textContent = 'Administrator';
+                    }
+                    if (document.getElementById('welcomeName')) {
+                        document.getElementById('welcomeName').textContent = 'Administrator';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                    window.location.href = '../login.html';
+                } else {
+                    if (document.getElementById('adminName')) {
+                        document.getElementById('adminName').textContent = 'Administrator';
+                    }
+                    if (document.getElementById('welcomeName')) {
+                        document.getElementById('welcomeName').textContent = 'Administrator';
+                    }
+                }
+            }
+        }
+
+        // Load staff
+        async function loadStaff() {
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    per_page: 8
+                });
+                
+                if (currentSearch) {
+                    params.append('search', currentSearch);
+                }
+
+                const { response, data } = await apiRequest(`/admin/staff?${params.toString()}`);
+
+                if (data.success) {
+                    displayStaff(data.staff);
+                    displayPagination(data.pagination);
+                    totalPages = data.pagination.total_pages;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to load staff'
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading staff:', error);
+                document.getElementById('staffTable').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error loading staff</td></tr>';
+            }
+        }
+
+        // Display staff in table
+        function displayStaff(staff) {
+            const tbody = document.getElementById('staffTable');
+            
+            if (!staff || staff.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No staff records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = staff.map(staffMember => {
+                // Status badge
+                const statusBadgeClass = staffMember.status === 'ACTIVE' ? 'bg-success' : 'bg-danger';
+                
+                // Role badge
+                let roleBadgeClass = 'bg-info';
+                if (staffMember.role === 'WASHER') roleBadgeClass = 'bg-primary';
+                else if (staffMember.role === 'DETAILER') roleBadgeClass = 'bg-warning text-dark';
+
+                // Format shift times
+                const formatTime = (time) => {
+                    if (!time || time === '00:00:00' || time === 'Not Set') return 'Not Set';
+                    const [hours, minutes] = time.split(':');
+                    const hour12 = hours % 12 || 12;
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    return `${hour12}:${minutes} ${ampm}`;
+                };
+
+                const shiftStart = formatTime(staffMember.shiftstart);
+                const shiftEnd = formatTime(staffMember.shiftend);
+                const role = staffMember.role || 'Not Set';
+                const status = staffMember.status || 'Not Set';
+
+                return `
+                    <tr>
+                        <td>${staffMember.staffid}</td>
+                        <td>${staffMember.userid}</td>
+                        <td>${staffMember.username}</td>
+                        <td><span class="badge ${roleBadgeClass}">${role}</span></td>
+                        <td><span class="badge ${statusBadgeClass}">${status}</span></td>
+                        <td>${shiftStart}</td>
+                        <td>${shiftEnd}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="editStaff(${staffMember.staffid})">
+                                <i class="bi bi-gear"></i> Set
+                            </button>
+                            ${staffMember.status === 'ACTIVE' 
+                                ? `<button class="btn btn-sm btn-warning" onclick="archiveStaff(${staffMember.staffid})">
+                                    <i class="bi bi-archive"></i> Archive
+                                   </button>`
+                                : `<button class="btn btn-sm btn-success" onclick="restoreStaff(${staffMember.staffid})">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                   </button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Display pagination
+        function displayPagination(pagination) {
+            const paginationEl = document.getElementById('pagination');
+            const infoEl = document.getElementById('paginationInfo');
+            
+            const { current_page, per_page, total, total_pages } = pagination;
+            const start = (current_page - 1) * per_page + 1;
+            const end = Math.min(current_page * per_page, total);
+            
+            infoEl.textContent = `Showing ${start}-${end} of ${total} records`;
+
+            if (total_pages <= 1) {
+                paginationEl.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // First and Previous buttons
+            if (current_page > 1) {
+                html += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(1); return false;">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${current_page - 1}); return false;">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                `;
+            }
+
+            // Page numbers
+            const startPage = Math.max(1, current_page - 2);
+            const endPage = Math.min(total_pages, current_page + 2);
+
+            if (startPage > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(1); return false;">1</a></li>`;
+                if (startPage > 2) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `
+                    <li class="page-item ${i === current_page ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
+                    </li>
+                `;
+            }
+
+            if (endPage < total_pages) {
+                if (endPage < total_pages - 1) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(${total_pages}); return false;">${total_pages}</a></li>`;
+            }
+
+            // Next and Last buttons
+            if (current_page < total_pages) {
+                html += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${current_page + 1}); return false;">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${total_pages}); return false;">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                `;
+            }
+
+            paginationEl.innerHTML = html;
+        }
+
+        // Go to page
+        function goToPage(page) {
+            currentPage = page;
+            loadStaff();
+        }
+
+        // Edit staff
+        async function editStaff(staffid) {
+            try {
+                const { response, data } = await apiRequest(`/admin/staff/${staffid}`);
+
+                if (data.success && data.staff) {
+                    const staff = data.staff;
+                    document.getElementById('editStaffid').value = staff.staffid;
+                    document.getElementById('editUserid').value = staff.userid;
+                    document.getElementById('editUsername').value = staff.username;
+                    document.getElementById('editRole').value = staff.role || '';
+                    document.getElementById('editStatus').value = staff.status || 'ACTIVE';
+                    
+                    // Format time for time input (HH:mm)
+                    const formatTimeForInput = (time) => {
+                        if (!time || time === '00:00:00' || time === 'Not Set') return '';
+                        return time.substring(0, 5); // Get HH:mm from HH:mm:ss
+                    };
+                    
+                    document.getElementById('editShiftStart').value = formatTimeForInput(staff.shiftstart);
+                    document.getElementById('editShiftEnd').value = formatTimeForInput(staff.shiftend);
+
+                    const modal = new bootstrap.Modal(document.getElementById('editStaffModal'));
+                    modal.show();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to load staff details'
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading staff:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load staff details'
+                });
+            }
+        }
+
+        // Handle edit staff
+        async function handleEditStaff() {
+            const form = document.getElementById('editStaffForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Get form values
+            const staffid = document.getElementById('editStaffid').value;
+            const role = document.getElementById('editRole').value;
+            const status = document.getElementById('editStatus').value;
+            const shiftstart = document.getElementById('editShiftStart').value;
+            const shiftend = document.getElementById('editShiftEnd').value;
+
+            // Validate shift times
+            if (shiftstart && shiftend) {
+                const startTime = new Date(`2000-01-01T${shiftstart}:00`);
+                const endTime = new Date(`2000-01-01T${shiftend}:00`);
+                
+                if (endTime <= startTime) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Shift end time must be after shift start time'
+                    });
+                    return;
+                }
+            }
+
+            const data = {
+                role: role,
+                status: status,
+                shiftstart: shiftstart,
+                shiftend: shiftend
+            };
+
+            try {
+                const { response, data: result } = await apiRequest(`/admin/staff/${staffid}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Staff details updated successfully'
+                    }).then(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editStaffModal'));
+                        modal.hide();
+                        loadStaff();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: result.message || 'Failed to update staff'
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating staff:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to update staff: ' + (error.message || 'Unknown error')
+                });
+            }
+        }
+
+        // Archive staff
+        async function archiveStaff(staffid) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "This staff member will be archived (set to INACTIVE).",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, archive it!'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const { response, data } = await apiRequest(`/admin/staff/${staffid}/archive`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Archived!',
+                            text: 'Staff member has been archived successfully'
+                        }).then(() => {
+                            loadStaff();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message || 'Failed to archive staff'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error archiving staff:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to archive staff'
+                    });
+                }
+            }
+        }
+
+        // Restore staff
+        async function restoreStaff(staffid) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "This staff member will be restored (set to ACTIVE).",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, restore it!'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const { response, data } = await apiRequest(`/admin/staff/${staffid}/restore`, {
+                        method: 'POST'
+                    });
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Restored!',
+                            text: 'Staff member has been restored successfully'
+                        }).then(() => {
+                            loadStaff();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message || 'Failed to restore staff'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error restoring staff:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to restore staff'
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

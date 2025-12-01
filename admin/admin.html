@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="JoWash Admin Dashboard - Professional Car Wash Management System">
+    <meta name="author" content="JoWash">
+    <meta name="theme-color" content="#0061f2">
+
+    <title>JoWash | Admin Dashboard</title>
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="ts-main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2>Jo<span>Wash</span></h2>
+            </div>
+            
+            <div class="profile-section">
+                <a href="edit-profile.html">
+                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='profile/default.jpg'">
+                </a>
+                <h5 class="profile-name" id="adminName">Loading...</h5>
+                <div class="profile-role">Administrator</div>
+            </div>
+            
+            <div class="sidebar-menu-header">MAIN NAVIGATION</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin.html" class="active">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="accounts.html">
+                        <i class="bi bi-people"></i> Accounts
+                    </a>
+                </li>
+                <li>
+                    <a href="services.html">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
+                </li>
+                <li>
+                    <a href="staff.html">
+                        <i class="bi bi-person-badge"></i> Staff
+                    </a>
+                </li>
+                <li>
+                    <a href="bookings.html">
+                        <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-menu-header"></div>
+            
+            <div class="logout-link">
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </div>
+                    <h4 class="header-title">Dashboard Overview</h4>
+                </div>
+                <div class="header-actions">
+                    <div class="header-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="container-fluid">
+                <!-- Welcome Section -->
+                <div class="dashboard-welcome">
+                    <h2 class="welcome-title">Welcome back, <span id="welcomeName">Admin</span>!</h2>
+                    <p class="welcome-subtitle">Here's what's happening with your car wash business today.</p>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="row">
+                    <!-- Total Users Card -->
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-card-body">
+                                <div class="stats-card-icon bg-primary">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div class="stats-card-content">
+                                    <h2 class="stats-card-value" id="totalUsers">0</h2>
+                                    <p class="stats-card-label">Active Users</p>
+                                </div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <a href="accounts.html" class="stats-card-link">
+                                    View All Users
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Services Card -->
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-card-body">
+                                <div class="stats-card-icon bg-success">
+                                    <i class="bi bi-tools"></i>
+                                </div>
+                                <div class="stats-card-content">
+                                    <h2 class="stats-card-value" id="totalServices">0</h2>
+                                    <p class="stats-card-label">Active Services</p>
+                                </div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <a href="services.html" class="stats-card-link">
+                                    Manage Services
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Bookings Card -->
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-card-body">
+                                <div class="stats-card-icon bg-info">
+                                    <i class="bi bi-calendar-check-fill"></i>
+                                </div>
+                                <div class="stats-card-content">
+                                    <h2 class="stats-card-value" id="totalBookings">0</h2>
+                                    <p class="stats-card-label">Total Bookings</p>
+                                </div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <a href="bookings.html" class="stats-card-link">
+                                    View All Bookings
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            const token = getAuthToken();
+            const userType = localStorage.getItem('user_type');
+
+            if (!token || userType !== 'ADMIN') {
+                // Redirect to login if not authenticated or not admin
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+
+            // Load user info and dashboard stats
+            loadUserInfo();
+            loadDashboardStats();
+
+            // Sidebar toggle
+            document.querySelector('.menu-toggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+            });
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const token = getAuthToken();
+                    if (token) {
+                        await apiRequest('/logout', {
+                            method: 'POST'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    // Remove token from localStorage
+                    removeAuthToken();
+                    // Redirect to login page
+                    window.location.href = '../login.html';
+                }
+            });
+        });
+
+        // Load user information
+        async function loadUserInfo() {
+            try {
+                const { response, data } = await apiRequest('/admin/user-info');
+
+                if (data.success && data.user) {
+                    const user = data.user;
+                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
+                    
+                    document.getElementById('adminName').textContent = fullName;
+                    document.getElementById('welcomeName').textContent = fullName;
+                    
+                    // Profile pic path - use the path from API or default
+                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    // If path doesn't start with profile/, add it
+                    if (!profilePicPath.startsWith('profile/')) {
+                        profilePicPath = 'profile/' + profilePicPath;
+                    }
+                    document.getElementById('profilePic').src = profilePicPath;
+                } else {
+                    console.error('Failed to load user info:', data.message || 'Unknown error');
+                    // If unauthorized, redirect to login
+                    if (response && (response.status === 401 || response.status === 403)) {
+                        window.location.href = '../login.html';
+                        return;
+                    }
+                    // Otherwise show default name
+                    document.getElementById('adminName').textContent = 'Administrator';
+                    document.getElementById('welcomeName').textContent = 'Administrator';
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                // Only redirect if it's an auth error, otherwise show default
+                if (error.message && error.message.includes('401')) {
+                    window.location.href = '../login.html';
+                } else {
+                    document.getElementById('adminName').textContent = 'Administrator';
+                    document.getElementById('welcomeName').textContent = 'Administrator';
+                }
+            }
+        }
+
+        // Load dashboard statistics
+        async function loadDashboardStats() {
+            try {
+                const { response, data } = await apiRequest('/admin/dashboard-stats');
+
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('totalUsers').textContent = stats.total_users;
+                    document.getElementById('totalServices').textContent = stats.total_services;
+                    document.getElementById('totalBookings').textContent = stats.total_bookings;
+                } else {
+                    console.error('Error loading dashboard stats:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+

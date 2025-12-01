@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="JoWash Admin Dashboard - Professional Car Wash Management System">
+    <meta name="author" content="JoWash">
+    <meta name="theme-color" content="#0061f2">
+
+    <title>JoWash | Edit Profile</title>
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* Profile Section Styles */
+        .profile-container {
+            padding: 20px 0;
+        }
+
+        .profile-sidebar {
+            background-color: #6900c7ff;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+            padding: 30px;
+            text-align: center;
+            height: 400px;
+        }
+
+        .profile-image-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-image {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            width: 100%;
+            height: 0;
+            transition: .5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-image:hover .image-overlay {
+            height: 40px;
+        }
+
+        .upload-btn {
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .profile-content .card {
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .profile-content .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e3e6ec;
+            padding: 20px 24px;
+        }
+
+        .profile-content .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e1e1e;
+        }
+
+        .profile-content .card-body {
+            padding: 24px;
+        }
+
+        .address-section {
+            border-top: 1px solid #e3e6ec;
+            padding-top: 20px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e1e1e;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #687281;
+        }
+
+        .form-control {
+            border: 1px solid #e3e6ec;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 0.35rem;
+        }
+
+        .form-control:focus {
+            border-color: #0061f2;
+            box-shadow: 0 0 0 0.25rem rgba(0, 97, 242, 0.25);
+        }
+
+        .form-control:disabled, .form-control[readonly] {
+            background-color: #f2f6fc;
+        }
+
+        .btn-primary {
+            background-color: #0061f2;
+            border-color: #0061f2;
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052cc;
+            border-color: #0052cc;
+        }
+
+        .btn-outline-secondary {
+            color: #687281;
+            border-color: #687281;
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #687281;
+            color: #fff;
+        }
+
+        @media (max-width: 767.98px) {
+            .profile-sidebar {
+                margin-bottom: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ts-main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2>Jo<span>Wash</span></h2>
+            </div>
+            
+            <div class="profile-section">
+                <a href="edit-profile.html">
+                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="sidebarProfilePic" onerror="this.src='profile/default.jpg'">
+                </a>
+                <h5 class="profile-name" id="sidebarAdminName">Loading...</h5>
+                <div class="profile-role">Administrator</div>
+            </div>
+            
+            <div class="sidebar-menu-header">MAIN NAVIGATION</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin.html">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="accounts.html">
+                        <i class="bi bi-people"></i> Accounts
+                    </a>
+                </li>
+                <li>
+                    <a href="services.html">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
+                </li>
+                <li>
+                    <a href="staff.html">
+                        <i class="bi bi-person-badge"></i> Staff
+                    </a>
+                </li>
+                <li>
+                    <a href="bookings.html">
+                        <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-menu-header"></div>
+            <div class="logout-link">
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </div>
+                    <h4 class="header-title">Profile</h4>
+                </div>
+                <div class="header-actions">
+                    <div class="header-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Section -->
+            <div class="container-fluid">
+                <!-- Welcome Section -->
+                <div class="dashboard-welcome">
+                    <h2 class="welcome-title">Profile Management</h2>
+                    <p class="welcome-subtitle">Update your personal information</p>
+                </div>
+                
+                <!-- Profile Section -->
+                <div class="profile-container">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="profile-sidebar">
+                                <div class="profile-image-container">
+                                    <div class="profile-image">
+                                        <img src="profile/default.jpg" alt="Profile Picture" id="profileImage" onerror="this.src='profile/default.jpg'">
+                                        <div class="image-overlay">
+                                            <label for="profile-upload" class="upload-btn">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h4 class="profile-name" id="profileName">Loading...</h4>
+                                <p class="profile-role" id="profileRole">ADMIN</p>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="profile-content">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Profile Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="profileForm">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="userid" class="form-label">User ID</label>
+                                                    <input type="text" class="form-control" id="userid" name="userid" readonly>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="usertype" class="form-label">User Type</label>
+                                                    <input type="text" class="form-control" id="usertype" name="usertype" readonly>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="username" class="form-label">Username</label>
+                                                    <input type="text" class="form-control" id="username" name="username" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="email" class="form-label">Email</label>
+                                                    <input type="email" class="form-control" id="email" name="email" readonly>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="fname" class="form-label">First Name</label>
+                                                    <input type="text" class="form-control" id="fname" name="fname" required>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="minnitial" class="form-label">Middle Initial</label>
+                                                    <input type="text" class="form-control" id="minnitial" name="minnitial" maxlength="1">
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="lname" class="form-label">Last Name</label>
+                                                    <input type="text" class="form-control" id="lname" name="lname" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="birthdate" class="form-label">Birthdate</label>
+                                                    <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="contact" class="form-label">Contact Number</label>
+                                                    <input type="text" class="form-control" id="contact" name="contact" required>
+                                                </div>
+                                                <div class="col-md-12 mb-3">
+                                                    <label for="profile-upload" class="form-label">Profile Picture</label>
+                                                    <input type="file" class="form-control" id="profile-upload" name="profilepic" accept="image/*">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="address-section mt-4">
+                                                <h6 class="section-title">Address Information</h6>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="street" class="form-label">Street</label>
+                                                        <input type="text" class="form-control" id="street" name="street" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="barangay" class="form-label">Barangay</label>
+                                                        <input type="text" class="form-control" id="barangay" name="barangay" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="city" class="form-label">City</label>
+                                                        <input type="text" class="form-control" id="city" name="city" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="province" class="form-label">Province</label>
+                                                        <input type="text" class="form-control" id="province" name="province" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="country" class="form-label">Country</label>
+                                                        <input type="text" class="form-control" id="country" name="country" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="postalcode" class="form-label">Postal Code</label>
+                                                        <input type="text" class="form-control" id="postalcode" name="postalcode" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                                <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                                                <button type="submit" class="btn btn-primary" id="submitBtn">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Check authentication on page load
+        if (!isAuthenticated()) {
+            window.location.href = '../login.html';
+        }
+
+        // Load profile data
+        async function loadProfile() {
+            try {
+                const { response, data } = await apiRequest('/admin/profile', {
+                    method: 'GET'
+                });
+
+                if (data.success && data.profile) {
+                    const profile = data.profile;
+                    
+                    // Populate form fields
+                    document.getElementById('userid').value = profile.userid || '';
+                    document.getElementById('usertype').value = profile.usertype || 'ADMIN';
+                    document.getElementById('username').value = profile.username || '';
+                    document.getElementById('email').value = profile.email || '';
+                    document.getElementById('fname').value = profile.fname || '';
+                    document.getElementById('minnitial').value = profile.minnitial || '';
+                    document.getElementById('lname').value = profile.lname || '';
+                    document.getElementById('birthdate').value = profile.birthdate || '';
+                    document.getElementById('contact').value = profile.contact || '';
+                    document.getElementById('street').value = profile.street || '';
+                    document.getElementById('barangay').value = profile.barangay || '';
+                    document.getElementById('city').value = profile.city || '';
+                    document.getElementById('province').value = profile.province || '';
+                    document.getElementById('country').value = profile.country || '';
+                    document.getElementById('postalcode').value = profile.postalcode || '';
+
+                    // Update profile image
+                    let profilePicPath = profile.profilepic || 'profile/default.jpg';
+                    // If it's a full URL, use it; otherwise use local path
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        if (!profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'profile/' + profilePicPath;
+                        }
+                    }
+                    document.getElementById('profileImage').src = profilePicPath;
+                    document.getElementById('sidebarProfilePic').src = profilePicPath;
+
+                    // Update names
+                    const fullName = `${profile.fname || ''} ${profile.lname || ''}`.trim() || 'Administrator';
+                    document.getElementById('profileName').textContent = fullName;
+                    document.getElementById('sidebarAdminName').textContent = fullName;
+                    document.getElementById('profileRole').textContent = profile.usertype || 'ADMIN';
+                } else {
+                    console.error('Failed to load profile:', data.message || 'Unknown error');
+                    if (response.status === 401 || response.status === 403) {
+                        window.location.href = '../login.html';
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to load profile',
+                            icon: 'error'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to load profile. Please try again.',
+                    icon: 'error'
+                });
+            }
+        }
+
+        // Handle profile picture preview
+        document.getElementById('profile-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                const token = getAuthToken();
+                const formData = new FormData(this);
+                
+                // Remove userid and usertype from form data (readonly fields)
+                formData.delete('userid');
+                formData.delete('usertype');
+                formData.delete('email');
+
+                // Use fetch directly for FormData (can't use apiRequest as it sets JSON Content-Type)
+                const response = await fetch(`${API_BASE_URL}/admin/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                        // Don't set Content-Type - let browser set it with boundary for FormData
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update profile image if new one was uploaded
+                    if (data.profile && data.profile.profilepic) {
+                        let profilePicPath = data.profile.profilepic;
+                        if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                            if (!profilePicPath.startsWith('profile/')) {
+                                profilePicPath = 'profile/' + profilePicPath;
+                            }
+                        }
+                        document.getElementById('profileImage').src = profilePicPath;
+                        document.getElementById('sidebarProfilePic').src = profilePicPath;
+                    }
+                    
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message || 'Profile updated successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload profile to get updated data
+                        loadProfile();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to update profile',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while updating your profile. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Load sidebar user info
+        async function loadSidebarInfo() {
+            try {
+                const { response, data } = await apiRequest('/admin/user-info');
+
+                if (data.success && data.user) {
+                    const user = data.user;
+                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
+                    
+                    document.getElementById('sidebarAdminName').textContent = fullName;
+                    
+                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    // If it's a full URL, use it; otherwise use local path
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        if (!profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'profile/' + profilePicPath;
+                        }
+                    }
+                    document.getElementById('sidebarProfilePic').src = profilePicPath;
+                }
+            } catch (error) {
+                console.error('Error loading sidebar info:', error);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar menu on mobile
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    document.querySelector('.sidebar').classList.toggle('collapsed');
+                    document.querySelector('.content-wrapper').classList.toggle('expanded');
+                });
+            }
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const token = getAuthToken();
+                    if (token) {
+                        await apiRequest('/logout', {
+                            method: 'POST'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    removeAuthToken();
+                    window.location.href = '../login.html';
+                }
+            });
+
+            // Load profile data
+            loadProfile();
+        });
+    </script>
+</body>
+</html>
+

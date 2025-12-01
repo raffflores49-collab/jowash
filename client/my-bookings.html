@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - JoWash Car Wash Services</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- AOS Animation Library -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/client.css">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .booking-card {
+      transition: transform 0.3s;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      background: white;
+    }
+    
+    .booking-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .booking-image {
+      height: 180px;
+      object-fit: cover;
+      width: 100%;
+    }
+    
+    .status-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+    
+    .booking-details {
+      padding: 1.5rem;
+    }
+    
+    .booking-date {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    
+    .booking-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .booking-actions .btn {
+      flex: 1;
+      min-width: 100px;
+    }
+    
+    .filter-card {
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      background: white;
+    }
+    
+    .no-bookings {
+      background-color: #f8f9fa;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .page-header {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+      padding: 50px 0 80px;
+      margin-bottom: -50px;
+    }
+    
+    .content-section {
+      background-color: #f8f9fa;
+      border-radius: 12px 12px 0 0;
+      position: relative;
+      z-index: 1;
+      padding-top: 30px;
+      min-height: 500px;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    
+    .pagination .page-link {
+      color: #007bff;
+    }
+    
+    .position-relative {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="client.html">
+        <img src="assets/images/tyre.png" alt="JoWash Logo" style="width: 40px;">
+        <span class="ms-2 fw-bold text-primary">JoWash</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="client.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#services">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="client.html#contact">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-primary" href="#" id="logoutBtn">Logout</a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <div class="profile-dropdown">
+              <img src="profile/default.jpg" alt="Profile" class="profile-img" id="profilePic" data-bs-toggle="dropdown" aria-expanded="false" onerror="this.src='profile/default.jpg'">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li class="user-info p-3">
+                  <h6 class="mb-0" id="userName">Loading...</h6>
+                  <small class="text-muted" id="userEmail">Loading...</small>
+                </li>
+                <li><a class="dropdown-item" href="edit-profile.html"><i class="fas fa-user-edit me-2"></i> Edit Profile</a></li>
+                <li><a class="dropdown-item active" href="my-bookings.html"><i class="fas fa-calendar-check me-2"></i> My Bookings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutDropdownBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="page-header" id="home">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-12 text-center" data-aos="fade-up">
+          <h1 class="display-4 fw-bold mb-4">My Bookings</h1>
+          <p class="lead mb-4">View and manage all your car wash service appointments in one place.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content Section -->
+  <section class="content-section py-5">
+    <div class="container">
+      <div class="row">
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3 mb-4" data-aos="fade-right">
+          <div class="filter-card">
+            <h5 class="mb-3">Filter Bookings</h5>
+            <form id="filter-form">
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="all" id="all-status" checked>
+                  <label class="form-check-label" for="all-status">
+                    All
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="PENDING" id="status-pending">
+                  <label class="form-check-label" for="status-pending">
+                    Pending
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="APPROVED" id="status-approved">
+                  <label class="form-check-label" for="status-approved">
+                    Approved
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="ONGOING" id="status-ongoing">
+                  <label class="form-check-label" for="status-ongoing">
+                    Ongoing
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="COMPLETED" id="status-completed">
+                  <label class="form-check-label" for="status-completed">
+                    Completed
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="CANCELLED" id="status-cancelled">
+                  <label class="form-check-label" for="status-cancelled">
+                    Cancelled
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="DECLINED" id="status-declined">
+                  <label class="form-check-label" for="status-declined">
+                    Declined
+                  </label>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Service Type</label>
+                <select class="form-select" id="service-filter">
+                  <option value="">All Services</option>
+                </select>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Date Range</label>
+                <input type="date" class="form-control mb-2" id="date-from" placeholder="From">
+                <input type="date" class="form-control" id="date-to" placeholder="To">
+              </div>
+              
+              <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+              <button type="reset" class="btn btn-outline-secondary w-100 mt-2">Reset</button>
+            </form>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <a href="client.html#services" class="btn btn-success">
+              <i class="fas fa-plus-circle me-2"></i> Book New Service
+            </a>
+          </div>
+        </div>
+        
+        <!-- Bookings List -->
+        <div class="col-lg-9" data-aos="fade-left">
+          <div id="bookingsContainer">
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pagination -->
+          <nav aria-label="Bookings pagination" class="mt-4" id="paginationContainer" style="display: none;">
+            <ul class="pagination justify-content-center" id="paginationList">
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Details Modal -->
+  <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="bookingDetailsContent">
+          <!-- Content will be loaded dynamically -->
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <img src="assets/images/tyre.png" alt="JoWash Logo" class="img-fluid mb-4" style="width: 100px;">
+          <p>JoWash provides professional car wash services with state-of-the-art equipment and eco-friendly products. Book your appointment online for a quick and efficient service.</p>
+          <div class="social-links mt-4">
+            <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2 footer-links">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="client.html">Home</a></li>
+            <li><a href="client.html#services">Services</a></li>
+            <li><a href="client.html#about">About Us</a></li>
+            <li><a href="client.html#contact">Contact</a></li>
+            <li><a href="#" id="footerLogoutBtn">Logout</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 footer-links">
+          <h5>Our Services</h5>
+          <ul id="footerServices">
+            <!-- Services will be loaded dynamically -->
+          </ul>
+        </div>
+        <div class="col-lg-3 footer-links">
+          <h5>Working Hours</h5>
+          <ul>
+            <li>Monday - Friday: 8:00 AM - 7:00 PM</li>
+            <li>Saturday: 8:00 AM - 5:00 PM</li>
+            <li>Sunday: Closed</li>
+          </ul>
+          <h5 class="mt-4">Contact</h5>
+          <p>(123) 456-7890<br>info@jowash.com</p>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 JoWash. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <a href="#" class="btn btn-primary back-to-top position-fixed bottom-0 end-0 m-4" role="button" id="backToTopBtn" style="display: none;">
+    <i class="fas fa-arrow-up"></i>
+  </a>
+  
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- AOS Animation Library -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  
+  <!-- API Utility -->
+  <script src="../js/api.js"></script>
+  
+  <script>
+    // Initialize AOS
+    AOS.init();
+    
+    // Check authentication
+    if (!isAuthenticated()) {
+      window.location.href = '../login.html';
+    }
+
+    const userInfo = getUserInfo();
+    if (!userInfo || userInfo.usertype !== 'CLIENT') {
+      window.location.href = '../login.html';
+    }
+
+    // Current page state
+    let currentPage = 1;
+    let currentFilters = {
+      status: '',
+      service: '',
+      date_from: '',
+      date_to: ''
+    };
+
+    // Load user info for navigation
+    async function loadUserInfo() {
+      try {
+        const { response, data } = await apiRequest('/client/user-info');
+        if (data.success && data.user) {
+          const user = data.user;
+          document.getElementById('userName').textContent = `${user.fname} ${user.lname}`;
+          document.getElementById('userEmail').textContent = user.email;
+          
+          let profilePicPath = user.profilepic || 'profile/default.jpg';
+          if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+            if (!profilePicPath.startsWith('profile/')) {
+              profilePicPath = 'profile/' + profilePicPath;
+            }
+          }
+          document.getElementById('profilePic').src = profilePicPath;
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    // Load services for filter dropdown
+    async function loadServices() {
+      try {
+        const { response, data } = await apiRequest('/client/services');
+        if (data.success && data.services) {
+          const serviceSelect = document.getElementById('service-filter');
+          const footerServices = document.getElementById('footerServices');
+          
+          data.services.forEach(service => {
+            // Add to filter dropdown
+            const option = document.createElement('option');
+            option.value = service.servicenum;
+            option.textContent = service.name;
+            serviceSelect.appendChild(option);
+            
+            // Add to footer
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `book-service.html?service=${service.servicenum}`;
+            a.textContent = service.name;
+            li.appendChild(a);
+            footerServices.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+      }
+    }
+
+    // Get badge class for status
+    function getStatusBadgeClass(status) {
+      switch(status) {
+        case 'PENDING':
+          return 'bg-warning';
+        case 'APPROVED':
+          return 'bg-primary';
+        case 'ONGOING':
+          return 'bg-info';
+        case 'COMPLETED':
+          return 'bg-success';
+        case 'CANCELLED':
+        case 'DECLINED':
+          return 'bg-danger';
+        default:
+          return 'bg-secondary';
+      }
+    }
+
+    // Format date and time
+    function formatDateTime(dateTimeString) {
+      const date = new Date(dateTimeString);
+      const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      return { date: dateStr, time: timeStr };
+    }
+
+    // Calculate end time
+    function calculateEndTime(startDateTime, durationMinutes) {
+      const start = new Date(startDateTime);
+      const end = new Date(start.getTime() + (durationMinutes * 60000));
+      return end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+
+    // Load bookings
+    async function loadBookings(page = 1) {
+      try {
+        currentPage = page;
+        const container = document.getElementById('bookingsContainer');
+        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        // Build query parameters
+        const params = new URLSearchParams({
+          page: page,
+          per_page: 6
+        });
+
+        if (currentFilters.status) {
+          params.append('status', currentFilters.status);
+        }
+        if (currentFilters.service) {
+          params.append('service', currentFilters.service);
+        }
+        if (currentFilters.date_from) {
+          params.append('date_from', currentFilters.date_from);
+        }
+        if (currentFilters.date_to) {
+          params.append('date_to', currentFilters.date_to);
+        }
+
+        const { response, data } = await apiRequest(`/client/bookings?${params.toString()}`);
+
+        if (data.success && data.bookings) {
+          if (data.bookings.length === 0) {
+            container.innerHTML = `
+              <div class="col-12">
+                <div class="no-bookings">
+                  <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                  <h3 class="mb-3">No Bookings Found</h3>
+                  <p class="text-muted mb-4">You haven't made any bookings yet. Start by booking a service!</p>
+                  <a href="client.html#services" class="btn btn-primary">Browse Services</a>
+                </div>
+              </div>
+            `;
+            document.getElementById('paginationContainer').style.display = 'none';
+          } else {
+            renderBookings(data.bookings);
+            renderPagination(data.pagination);
+          }
+        } else {
+          container.innerHTML = `
+            <div class="col-12">
+              <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${data.message || 'Failed to load bookings'}
+              </div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        document.getElementById('bookingsContainer').innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              An error occurred while loading bookings. Please try again.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Render bookings
+    function renderBookings(bookings) {
+      const container = document.getElementById('bookingsContainer');
+      let bookingsHTML = '<div class="row g-4">';
+
+      bookings.forEach(booking => {
+        const badgeClass = getStatusBadgeClass(booking.status);
+        const { date, time } = formatDateTime(booking.start);
+        const endTime = calculateEndTime(booking.start, booking.duration);
+        
+        // Get image URL (service images are in frontend/admin/service/)
+        let imageUrl = booking.image || 'service/default.jpg';
+        if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          imageUrl = `http://127.0.0.1:8000/${imageUrl}`;
+        }
+
+        bookingsHTML += `
+          <div class="col-md-6 col-lg-4">
+            <div class="booking-card">
+              <div class="position-relative">
+                <img src="${imageUrl}" class="booking-image" alt="${booking.service_name}" onerror="this.src='http://127.0.0.1:8000/service/default.jpg'">
+                <span class="badge status-badge ${badgeClass}">${booking.status}</span>
+              </div>
+              <div class="booking-details">
+                <h5 class="card-title">${booking.service_name}</h5>
+                <p class="booking-date">
+                  <i class="far fa-calendar-alt me-2"></i>${date}<br>
+                  <i class="far fa-clock me-2"></i>${time} - ${endTime}
+                </p>
+                <p class="mb-2">
+                  <strong>Staff:</strong> ${booking.staff_name}
+                </p>
+                <p class="mb-2">
+                  <strong>Price:</strong> ₱${parseFloat(booking.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <div class="booking-actions">
+                  ${booking.status === 'PENDING' ? `
+                    <button class="btn btn-sm btn-danger cancel-booking" data-booknum="${booking.booknum}">
+                      Cancel Booking
+                    </button>
+                  ` : ''}
+                  ${booking.status === 'COMPLETED' ? `
+                    <button class="btn btn-sm btn-primary book-again" data-service-id="${booking.servicenum}">
+                      Book Again
+                    </button>
+                  ` : ''}
+                  <button class="btn btn-sm btn-outline-primary view-details" data-booking='${JSON.stringify(booking)}'>
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      bookingsHTML += '</div>';
+      container.innerHTML = bookingsHTML;
+
+      // Attach event listeners
+      attachEventListeners();
+    }
+
+    // Render pagination
+    function renderPagination(pagination) {
+      const container = document.getElementById('paginationContainer');
+      const list = document.getElementById('paginationList');
+      
+      if (pagination.total_pages <= 1) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      list.innerHTML = '';
+
+      // Previous button
+      if (pagination.current_page > 1) {
+        const prevLi = document.createElement('li');
+        prevLi.className = 'page-item';
+        prevLi.innerHTML = `<a class="page-link" href="#" data-page="${pagination.current_page - 1}">«</a>`;
+        list.appendChild(prevLi);
+      }
+
+      // Page numbers
+      const startPage = Math.max(1, pagination.current_page - 2);
+      const endPage = Math.min(pagination.total_pages, pagination.current_page + 2);
+
+      if (startPage > 1) {
+        const firstLi = document.createElement('li');
+        firstLi.className = 'page-item';
+        firstLi.innerHTML = `<a class="page-link" href="#" data-page="1">1</a>`;
+        list.appendChild(firstLi);
+        
+        if (startPage > 2) {
+          const ellipsis = document.createElement('li');
+          ellipsis.className = 'page-item disabled';
+          ellipsis.innerHTML = '<span class="page-link">...</span>';
+          list.appendChild(ellipsis);
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === pagination.current_page ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+        list.appendChild(li);
+      }
+
+      if (endPage < pagination.total_pages) {
+        if (endPage < pagination.total_pages - 1) {
+          const ellipsis = document.createElement('li');
+          ellipsis.className = 'page-item disabled';
+          ellipsis.innerHTML = '<span class="page-link">...</span>';
+          list.appendChild(ellipsis);
+        }
+        
+        const lastLi = document.createElement('li');
+        lastLi.className = 'page-item';
+        lastLi.innerHTML = `<a class="page-link" href="#" data-page="${pagination.total_pages}">${pagination.total_pages}</a>`;
+        list.appendChild(lastLi);
+      }
+
+      // Next button
+      if (pagination.current_page < pagination.total_pages) {
+        const nextLi = document.createElement('li');
+        nextLi.className = 'page-item';
+        nextLi.innerHTML = `<a class="page-link" href="#" data-page="${pagination.current_page + 1}">»</a>`;
+        list.appendChild(nextLi);
+      }
+
+      // Attach pagination click handlers
+      list.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const page = parseInt(this.getAttribute('data-page'));
+          if (page) {
+            loadBookings(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // Attach event listeners
+    function attachEventListeners() {
+      // Cancel booking
+      document.querySelectorAll('.cancel-booking').forEach(button => {
+        button.addEventListener('click', async function() {
+          const booknum = this.getAttribute('data-booknum');
+          
+          const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+          });
+
+          if (result.isConfirmed) {
+            try {
+              const { response, data } = await apiRequest(`/client/bookings/${booknum}/cancel`, {
+                method: 'POST'
+              });
+
+              if (data.success) {
+                Swal.fire({
+                  title: 'Cancelled!',
+                  text: data.message || 'Your booking has been cancelled.',
+                  icon: 'success',
+                  confirmButtonColor: '#007bff'
+                }).then(() => {
+                  loadBookings(currentPage);
+                });
+              } else {
+                Swal.fire({
+                  title: 'Error!',
+                  text: data.message || 'Failed to cancel booking',
+                  icon: 'error',
+                  confirmButtonColor: '#007bff'
+                });
+              }
+            } catch (error) {
+              console.error('Error cancelling booking:', error);
+              Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while cancelling the booking. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#007bff'
+              });
+            }
+          }
+        });
+      });
+
+      // Book again
+      document.querySelectorAll('.book-again').forEach(button => {
+        button.addEventListener('click', function() {
+          const serviceId = this.getAttribute('data-service-id');
+          window.location.href = `book-service.html?service=${serviceId}`;
+        });
+      });
+
+      // View details
+      document.querySelectorAll('.view-details').forEach(button => {
+        button.addEventListener('click', function() {
+          const bookingData = JSON.parse(this.getAttribute('data-booking'));
+          showBookingDetails(bookingData);
+        });
+      });
+    }
+
+    // Show booking details modal
+    function showBookingDetails(booking) {
+      const modal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
+      const content = document.getElementById('bookingDetailsContent');
+      
+      const badgeClass = getStatusBadgeClass(booking.status);
+      const { date, time } = formatDateTime(booking.start);
+      const endTime = calculateEndTime(booking.start, booking.duration);
+      
+      let imageUrl = booking.image || 'service/default.jpg';
+      if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        imageUrl = `http://127.0.0.1:8000/${imageUrl}`;
+      }
+
+      content.innerHTML = `
+        <div class="text-center mb-3">
+          <img src="${imageUrl}" alt="${booking.service_name}" class="img-fluid rounded mb-3" style="max-height: 200px;" onerror="this.src='http://127.0.0.1:8000/service/default.jpg'">
+          <h4>${booking.service_name}</h4>
+          <div class="d-inline-block">
+            <span class="badge ${badgeClass}">${booking.status}</span>
+          </div>
+        </div>
+        <div class="booking-info">
+          <p><strong>Booking ID:</strong> #${booking.booknum}</p>
+          <p><i class="far fa-calendar-alt me-2"></i><strong>Date:</strong> ${date}</p>
+          <p><i class="far fa-clock me-2"></i><strong>Time:</strong> ${time} - ${endTime}</p>
+          <p><i class="fas fa-user me-2"></i><strong>Staff:</strong> ${booking.staff_name}</p>
+          <p><i class="fas fa-tag me-2"></i><strong>Price:</strong> ₱${parseFloat(booking.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p><i class="fas fa-clock me-2"></i><strong>Duration:</strong> ${booking.duration} minutes</p>
+          ${booking.vehicletype ? `<p><i class="fas fa-car me-2"></i><strong>Vehicle Type:</strong> ${booking.vehicletype}</p>` : ''}
+        </div>
+      `;
+      
+      modal.show();
+    }
+
+    // Filter form handler
+    document.getElementById('filter-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      applyFilters();
+    });
+
+    document.getElementById('filter-form').addEventListener('reset', function() {
+      setTimeout(() => {
+        currentFilters = {
+          status: '',
+          service: '',
+          date_from: '',
+          date_to: ''
+        };
+        document.getElementById('all-status').checked = true;
+        loadBookings(1);
+      }, 10);
+    });
+
+    // Status checkbox synchronization
+    document.getElementById('all-status').addEventListener('change', function() {
+      const statusCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#all-status)');
+      if (this.checked) {
+        statusCheckboxes.forEach(checkbox => {
+          checkbox.checked = false;
+          checkbox.disabled = true;
+        });
+      } else {
+        statusCheckboxes.forEach(checkbox => {
+          checkbox.disabled = false;
+        });
+      }
+    });
+
+    document.querySelectorAll('input[type="checkbox"]:not(#all-status)').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const allCheckbox = document.getElementById('all-status');
+        if (this.checked) {
+          allCheckbox.checked = false;
+        }
+      });
+    });
+
+    // Apply filters
+    function applyFilters() {
+      const allCheckbox = document.getElementById('all-status');
+      const statusCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#all-status)');
+      const serviceFilter = document.getElementById('service-filter').value;
+      const dateFrom = document.getElementById('date-from').value;
+      const dateTo = document.getElementById('date-to').value;
+      
+      let statuses = [];
+      
+      if (allCheckbox.checked) {
+        currentFilters.status = '';
+      } else {
+        statusCheckboxes.forEach(checkbox => {
+          if (checkbox.checked) {
+            statuses.push(checkbox.value);
+          }
+        });
+        currentFilters.status = statuses.join(',');
+      }
+      
+      currentFilters.service = serviceFilter;
+      currentFilters.date_from = dateFrom;
+      currentFilters.date_to = dateTo;
+      
+      loadBookings(1);
+    }
+
+    // Back to top button
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.style.display = 'block';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+
+    backToTopBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Logout handlers
+    async function handleLogout() {
+      try {
+        const token = getAuthToken();
+        if (token) {
+          await apiRequest('/logout', { method: 'POST' });
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+      } finally {
+        removeAuthToken();
+        window.location.href = '../login.html';
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    document.getElementById('logoutDropdownBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleLogout();
+    });
+
+    const footerLogoutBtn = document.getElementById('footerLogoutBtn');
+    if (footerLogoutBtn) {
+      footerLogoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleLogout();
+      });
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserInfo();
+      loadServices();
+      loadBookings(1);
+    });
+  </script>
+</body>
+</html>
+

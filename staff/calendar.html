@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="JoWash Staff Calendar - Professional Car Wash Management System">
+    <meta name="author" content="JoWash">
+    <meta name="theme-color" content="#0061f2">
+
+    <title>JoWash | Staff Calendar</title>
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="shortcut icon" href="assets/images/tyre.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/staff.css">
+    <style>
+        .calendar-container {
+            margin-bottom: 30px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-date-selector {
+            display: flex;
+            align-items: center;
+        }
+        
+        .calendar-date-selector a {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        
+        .calendar-date-selector a:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .calendar-grid {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .time-slot {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .time-slot:last-child {
+            border-bottom: none;
+        }
+        
+        .time-label {
+            width: 80px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .time-content {
+            flex: 1;
+            padding: 10px 15px;
+            min-height: 80px;
+        }
+        
+        .appointment-card {
+            background-color: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        
+        .appointment-card.pending {
+            background-color: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        
+        .appointment-card.approved {
+            background-color: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        
+        .appointment-card.ongoing {
+            background-color: #e1f5fe;
+            border-left-color: #03a9f4;
+        }
+        
+        .appointment-card.completed {
+            background-color: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        
+        .appointment-card.cancelled, .appointment-card.declined {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+        
+        .appointment-card h6 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .appointment-card p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .empty-slot {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        .date-selector-form {
+            display: flex;
+            align-items: center;
+        }
+        
+        .date-selector-form input {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        
+        .date-selector-form button {
+            background-color: #0061f2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .calendar-tab {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .tab-heading {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #0061f2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ts-main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <h2>Jo<span>Wash</span></h2>
+            </div>
+            
+            <div class="profile-section">
+                <a href="edit-profile.html">
+                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="profilePic" onerror="this.src='profile/default.jpg'">
+                </a>
+                <h5 class="profile-name" id="staffName">Loading...</h5>
+                <div class="profile-role" id="staffRole">STAFF</div>
+            </div>
+            
+            <div class="sidebar-menu-header">MAIN NAVIGATION</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="staff.html">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="bookings.html">
+                        <i class="bi bi-calendar-check"></i> Bookings
+                    </a>
+                </li>
+                <li>
+                    <a href="calendar.html" class="active">
+                        <i class="bi bi-calendar-week"></i> Calendar
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-menu-header"></div>
+            
+            <div class="logout-link">
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </div>
+                    <h4 class="header-title">Staff Calendar</h4>
+                </div>
+                <div class="header-actions">
+                    <div class="header-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="container-fluid">
+                <!-- Calendar Date Selection -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="calendar-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-calendar3"></i>
+                                        Schedule Viewer
+                                    </h5>
+                                    
+                                    <div class="calendar-date-selector">
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="navigateDate(-1)">
+                                            <i class="bi bi-chevron-left"></i> Previous Day
+                                        </button>
+                                        
+                                        <form class="date-selector-form mx-2" id="dateForm" onsubmit="handleDateSubmit(event)">
+                                            <input type="date" id="dateInput" class="form-control form-control-sm">
+                                            <button type="submit" class="btn btn-sm btn-primary">Go</button>
+                                        </form>
+                                        
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="navigateDate(1)">
+                                            Next Day <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Today's Calendar -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="calendar-tab">
+                            <div class="tab-heading">
+                                <i class="bi bi-calendar-date"></i> 
+                                <span id="selectedDateHeading">Loading...</span>
+                            </div>
+                            
+                            <div class="calendar-grid" id="todayCalendar">
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tomorrow's Calendar -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="calendar-tab">
+                            <div class="tab-heading">
+                                <i class="bi bi-calendar-plus"></i> 
+                                <span id="nextDateHeading">Loading...</span>
+                            </div>
+                            
+                            <div class="calendar-grid" id="tomorrowCalendar">
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        let selectedDate = new Date().toISOString().split('T')[0];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = getAuthToken();
+            const userType = localStorage.getItem('user_type');
+
+            if (!token || userType !== 'STAFF') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+
+            // Check URL parameter for date
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateParam = urlParams.get('date');
+            if (dateParam) {
+                selectedDate = dateParam;
+            }
+
+            // Set date input
+            document.getElementById('dateInput').value = selectedDate;
+
+            // Load user info
+            loadUserInfo();
+
+            // Load calendar
+            loadCalendar();
+
+            // Sidebar toggle
+            document.querySelector('.menu-toggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+                document.querySelector('.content-wrapper').classList.toggle('expanded');
+            });
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const token = getAuthToken();
+                    if (token) {
+                        await apiRequest('/logout', { method: 'POST' });
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    removeAuthToken();
+                    window.location.href = '../login.html';
+                }
+            });
+        });
+
+        // Load user information
+        async function loadUserInfo() {
+            try {
+                const { response, data } = await apiRequest('/staff/user-info');
+
+                if (data.success && data.user) {
+                    const user = data.user;
+                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Staff';
+                    
+                    document.getElementById('staffName').textContent = fullName;
+                    document.getElementById('staffRole').textContent = user.role || 'STAFF';
+                    
+                    let profilePicPath = user.profilepic || 'profile/default.jpg';
+                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                        if (!profilePicPath.startsWith('profile/')) {
+                            profilePicPath = 'profile/' + profilePicPath;
+                        }
+                    }
+                    document.getElementById('profilePic').src = profilePicPath;
+                } else {
+                    if (response && (response.status === 401 || response.status === 403)) {
+                        window.location.href = '../login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        // Load calendar
+        async function loadCalendar() {
+            try {
+                const nextDate = new Date(selectedDate);
+                nextDate.setDate(nextDate.getDate() + 1);
+                const nextDateStr = nextDate.toISOString().split('T')[0];
+
+                const { response, data } = await apiRequest(`/staff/calendar?date=${selectedDate}&next_date=${nextDateStr}`);
+
+                if (data.success) {
+                    // Format dates for display
+                    const selectedDateObj = new Date(selectedDate);
+                    const nextDateObj = new Date(nextDateStr);
+                    
+                    const formattedSelectedDate = selectedDateObj.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    const formattedNextDate = nextDateObj.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    document.getElementById('selectedDateHeading').textContent = formattedSelectedDate;
+                    document.getElementById('nextDateHeading').textContent = formattedNextDate;
+
+                    // Render today's bookings
+                    renderBookings(data.bookings, 'todayCalendar');
+
+                    // Render tomorrow's bookings
+                    renderBookings(data.next_bookings, 'tomorrowCalendar');
+                } else {
+                    console.error('Error loading calendar:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading calendar:', error);
+            }
+        }
+
+        // Render bookings
+        function renderBookings(bookings, containerId) {
+            const container = document.getElementById(containerId);
+
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="no-schedules text-center py-5">
+                        <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                        <p class="mt-2">No bookings found for this date</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            bookings.forEach(booking => {
+                const bookingDate = new Date(booking.start);
+                const timeStr = bookingDate.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                const statusClass = booking.status.toLowerCase();
+                const statusBadgeColor = getStatusBadgeColor(booking.status);
+
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.innerHTML = `
+                    <div class="time-label">${timeStr}</div>
+                    <div class="time-content">
+                        <div class="appointment-card ${statusClass}">
+                            <h6>
+                                <span class="badge bg-${statusBadgeColor} me-1">
+                                    ${booking.status}
+                                </span>
+                                ${booking.service_name}
+                            </h6>
+                            <p>
+                                <strong>Customer:</strong> ${booking.fname} ${booking.lname} | 
+                                <strong>Vehicle:</strong> ${booking.vehicletype} | 
+                                <strong>Duration:</strong> ${booking.duration} mins
+                            </p>
+                            <small class="text-muted">
+                                Booking #${booking.booknum}
+                            </small>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(timeSlot);
+            });
+        }
+
+        // Navigate date
+        function navigateDate(days) {
+            const date = new Date(selectedDate);
+            date.setDate(date.getDate() + days);
+            selectedDate = date.toISOString().split('T')[0];
+            document.getElementById('dateInput').value = selectedDate;
+            loadCalendar();
+        }
+
+        // Handle date form submit
+        function handleDateSubmit(event) {
+            event.preventDefault();
+            selectedDate = document.getElementById('dateInput').value;
+            loadCalendar();
+        }
+
+        // Get status badge color
+        function getStatusBadgeColor(status) {
+            switch(status) {
+                case 'PENDING':
+                    return 'warning';
+                case 'APPROVED':
+                    return 'primary';
+                case 'ONGOING':
+                    return 'info';
+                case 'COMPLETED':
+                    return 'success';
+                case 'CANCELLED':
+                case 'DECLINED':
+                    return 'danger';
+                default:
+                    return 'secondary';
+            }
+        }
+    </script>
+</body>
+
+</html>
+
