@@ -201,31 +201,27 @@
             });
 
             // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', {
-                            method: 'POST'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
-                    // Remove token from localStorage
+                const token = getAuthToken();
+                if (token) {
+                    apiRequest('/logout', {
+                        method: 'POST'
+                    }).always(function() {
+                        removeAuthToken();
+                        window.location.href = '../login.html';
+                    });
+                } else {
                     removeAuthToken();
-                    // Redirect to login page
                     window.location.href = '../login.html';
                 }
             });
         });
 
         // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/admin/user-info');
-
+        function loadUserInfo() {
+            apiRequest('/admin/user-info').done(function(result) {
+                const { response, data } = result;
                 if (data.success && data.user) {
                     const user = data.user;
                     const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
@@ -258,23 +254,23 @@
                     document.getElementById('adminName').textContent = 'Administrator';
                     document.getElementById('welcomeName').textContent = 'Administrator';
                 }
-            } catch (error) {
-                console.error('Error loading user info:', error);
+            }).fail(function(result) {
+                console.error('Error loading user info:', result);
+                const { response } = result;
                 // Only redirect if it's an auth error, otherwise show default
-                if (error.message && error.message.includes('401')) {
+                if (response && (response.status === 401 || response.status === 403)) {
                     window.location.href = '../login.html';
                 } else {
                     document.getElementById('adminName').textContent = 'Administrator';
                     document.getElementById('welcomeName').textContent = 'Administrator';
                 }
-            }
+            });
         }
 
         // Load dashboard statistics
-        async function loadDashboardStats() {
-            try {
-                const { response, data } = await apiRequest('/admin/dashboard-stats');
-
+        function loadDashboardStats() {
+            apiRequest('/admin/dashboard-stats').done(function(result) {
+                const { data } = result;
                 if (data.success) {
                     const stats = data.stats;
                     document.getElementById('totalUsers').textContent = stats.total_users;
@@ -283,9 +279,9 @@
                 } else {
                     console.error('Error loading dashboard stats:', data.message);
                 }
-            } catch (error) {
-                console.error('Error loading dashboard stats:', error);
-            }
+            }).fail(function(result) {
+                console.error('Error loading dashboard stats:', result);
+            });
         }
     </script>
 </body>
