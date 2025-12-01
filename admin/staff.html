@@ -248,16 +248,15 @@
             });
 
             // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', { method: 'POST' });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                const token = getAuthToken();
+                if (token) {
+                    apiRequest('/logout', { method: 'POST' }).always(function() {
+                        removeAuthToken();
+                        window.location.href = '../login.html';
+                    });
+                } else {
                     removeAuthToken();
                     window.location.href = '../login.html';
                 }
@@ -273,8 +272,8 @@
             });
 
             // Edit staff form handler
-            document.getElementById('submitEditStaff').addEventListener('click', async function() {
-                await handleEditStaff();
+            document.getElementById('submitEditStaff').addEventListener('click', function() {
+                handleEditStaff();
             });
 
             // Reset edit form when modal is closed
@@ -284,10 +283,9 @@
         });
 
         // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/admin/user-info');
-
+        function loadUserInfo() {
+            apiRequest('/admin/user-info').done(function(result) {
+                const { response, data } = result;
                 if (data && data.success && data.user) {
                     const user = data.user;
                     const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
@@ -325,9 +323,10 @@
                         document.getElementById('welcomeName').textContent = 'Administrator';
                     }
                 }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+            }).fail(function(result) {
+                console.error('Error loading user info:', result);
+                const { response } = result;
+                if (response && (response.status === 401 || response.status === 403)) {
                     window.location.href = '../login.html';
                 } else {
                     if (document.getElementById('adminName')) {
@@ -337,23 +336,22 @@
                         document.getElementById('welcomeName').textContent = 'Administrator';
                     }
                 }
-            }
+            });
         }
 
         // Load staff
-        async function loadStaff() {
-            try {
-                const params = new URLSearchParams({
-                    page: currentPage,
-                    per_page: 8
-                });
-                
-                if (currentSearch) {
-                    params.append('search', currentSearch);
-                }
+        function loadStaff() {
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 8
+            });
+            
+            if (currentSearch) {
+                params.append('search', currentSearch);
+            }
 
-                const { response, data } = await apiRequest(`/admin/staff?${params.toString()}`);
-
+            apiRequest(`/admin/staff?${params.toString()}`).done(function(result) {
+                const { response, data } = result;
                 if (data.success) {
                     displayStaff(data.staff);
                     displayPagination(data.pagination);
@@ -365,11 +363,11 @@
                         text: data.message || 'Failed to load staff'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading staff:', error);
+            }).fail(function(result) {
+                console.error('Error loading staff:', result);
                 document.getElementById('staffTable').innerHTML = 
                     '<tr><td colspan="8" class="text-center text-danger">Error loading staff</td></tr>';
-            }
+            });
         }
 
         // Display staff in table
@@ -517,10 +515,9 @@
         }
 
         // Edit staff
-        async function editStaff(staffid) {
-            try {
-                const { response, data } = await apiRequest(`/admin/staff/${staffid}`);
-
+        function editStaff(staffid) {
+            apiRequest(`/admin/staff/${staffid}`).done(function(result) {
+                const { response, data } = result;
                 if (data.success && data.staff) {
                     const staff = data.staff;
                     document.getElementById('editStaffid').value = staff.staffid;
@@ -547,18 +544,18 @@
                         text: data.message || 'Failed to load staff details'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading staff:', error);
+            }).fail(function(result) {
+                console.error('Error loading staff:', result);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Failed to load staff details'
                 });
-            }
+            });
         }
 
         // Handle edit staff
-        async function handleEditStaff() {
+        function handleEditStaff() {
             const form = document.getElementById('editStaffForm');
             
             if (!form.checkValidity()) {
@@ -595,13 +592,12 @@
                 shiftend: shiftend
             };
 
-            try {
-                const { response, data: result } = await apiRequest(`/admin/staff/${staffid}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(data)
-                });
-
-                if (result.success) {
+            apiRequest(`/admin/staff/${staffid}`, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            }).done(function(result) {
+                const { response, data: resultData } = result;
+                if (resultData.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -615,22 +611,22 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: result.message || 'Failed to update staff'
+                        text: resultData.message || 'Failed to update staff'
                     });
                 }
-            } catch (error) {
-                console.error('Error updating staff:', error);
+            }).fail(function(result) {
+                console.error('Error updating staff:', result);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to update staff: ' + (error.message || 'Unknown error')
+                    text: 'Failed to update staff: ' + (result.data?.message || 'Unknown error')
                 });
-            }
+            });
         }
 
         // Archive staff
-        async function archiveStaff(staffid) {
-            const result = await Swal.fire({
+        function archiveStaff(staffid) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "This staff member will be archived (set to INACTIVE).",
                 icon: 'warning',
@@ -638,43 +634,42 @@
                 confirmButtonColor: '#ffc107',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, archive it!'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const { response, data } = await apiRequest(`/admin/staff/${staffid}/archive`, {
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    apiRequest(`/admin/staff/${staffid}/archive`, {
                         method: 'POST'
-                    });
-
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Archived!',
-                            text: 'Staff member has been archived successfully'
-                        }).then(() => {
-                            loadStaff();
-                        });
-                    } else {
+                    }).done(function(apiResult) {
+                        const { response, data } = apiResult;
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Archived!',
+                                text: 'Staff member has been archived successfully'
+                            }).then(() => {
+                                loadStaff();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'Failed to archive staff'
+                            });
+                        }
+                    }).fail(function(apiResult) {
+                        console.error('Error archiving staff:', apiResult);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
-                            text: data.message || 'Failed to archive staff'
+                            text: 'Failed to archive staff'
                         });
-                    }
-                } catch (error) {
-                    console.error('Error archiving staff:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Failed to archive staff'
                     });
                 }
-            }
+            });
         }
 
         // Restore staff
-        async function restoreStaff(staffid) {
-            const result = await Swal.fire({
+        function restoreStaff(staffid) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "This staff member will be restored (set to ACTIVE).",
                 icon: 'question',
@@ -682,38 +677,37 @@
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, restore it!'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const { response, data } = await apiRequest(`/admin/staff/${staffid}/restore`, {
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    apiRequest(`/admin/staff/${staffid}/restore`, {
                         method: 'POST'
-                    });
-
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Restored!',
-                            text: 'Staff member has been restored successfully'
-                        }).then(() => {
-                            loadStaff();
-                        });
-                    } else {
+                    }).done(function(apiResult) {
+                        const { response, data } = apiResult;
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Restored!',
+                                text: 'Staff member has been restored successfully'
+                            }).then(() => {
+                                loadStaff();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'Failed to restore staff'
+                            });
+                        }
+                    }).fail(function(apiResult) {
+                        console.error('Error restoring staff:', apiResult);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
-                            text: data.message || 'Failed to restore staff'
+                            text: 'Failed to restore staff'
                         });
-                    }
-                } catch (error) {
-                    console.error('Error restoring staff:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Failed to restore staff'
                     });
                 }
-            }
+            });
         }
     </script>
 </body>
