@@ -202,7 +202,7 @@
             
             <div class="profile-section">
                 <a href="edit-profile.html">
-                    <img src="profile/default.jpg" alt="Profile Picture" class="profile-pic" id="sidebarProfilePic" onerror="this.src='profile/default.jpg'">
+                    <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg" alt="Profile Picture" class="profile-pic" id="sidebarProfilePic" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg'">
                 </a>
                 <h5 class="profile-name" id="sidebarStaffName">Loading...</h5>
                 <div class="profile-role" id="sidebarStaffRole">STAFF</div>
@@ -268,7 +268,7 @@
                             <div class="profile-sidebar">
                                 <div class="profile-image-container">
                                     <div class="profile-image">
-                                        <img src="profile/default.jpg" alt="Profile Picture" id="profileImage" onerror="this.src='profile/default.jpg'">
+                                        <img src="https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg" alt="Profile Picture" id="profileImage" onerror="this.src='https://jowashlaravel.muccsbblock1.com/jowash-backend/frontend/staff/profile/default.jpg'">
                                         <div class="image-overlay">
                                             <label for="profile-upload" class="upload-btn">
                                                 <i class="bi bi-camera-fill"></i>
@@ -433,10 +433,14 @@
                     document.getElementById('postalcode').value = profile.postalcode || '';
 
                     // Update profile image
-                    let profilePicPath = profile.profilepic || 'profile/default.jpg';
+                    let profilePicPath = profile.profilepic || 'frontend/staff/profile/default.jpg';
                     if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-                        if (!profilePicPath.startsWith('profile/')) {
-                            profilePicPath = 'profile/' + profilePicPath;
+                        if (!profilePicPath.startsWith('frontend/staff/profile/')) {
+                            if (profilePicPath.startsWith('profile/')) {
+                                profilePicPath = 'frontend/staff/' + profilePicPath;
+                            } else {
+                                profilePicPath = 'frontend/staff/profile/' + profilePicPath;
+                            }
                         }
                         profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
                     }
@@ -541,8 +545,12 @@
                     if (data.profile && data.profile.profilepic) {
                         let profilePicPath = data.profile.profilepic;
                         if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-                            if (!profilePicPath.startsWith('profile/')) {
-                                profilePicPath = 'profile/' + profilePicPath;
+                            if (!profilePicPath.startsWith('frontend/staff/profile/')) {
+                                if (profilePicPath.startsWith('profile/')) {
+                                    profilePicPath = 'frontend/staff/' + profilePicPath;
+                                } else {
+                                    profilePicPath = 'frontend/staff/profile/' + profilePicPath;
+                                }
                             }
                             profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
                         }
