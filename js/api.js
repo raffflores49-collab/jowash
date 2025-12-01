@@ -19,14 +19,17 @@ function removeAuthToken() {
     localStorage.removeItem('user_id');
 }
 
-// Make authenticated API request
-async function apiRequest(endpoint, options = {}) {
+// Make authenticated API request using jQuery AJAX
+function apiRequest(endpoint, options = {}) {
     const token = getAuthToken();
     
     const defaultOptions = {
+        url: `${API_BASE_URL}${endpoint}`,
+        method: options.method || 'GET',
+        contentType: 'application/json',
+        dataType: 'json',
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            'Accept': 'application/json'
         }
     };
 
@@ -34,40 +37,60 @@ async function apiRequest(endpoint, options = {}) {
         defaultOptions.headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const finalOptions = {
-        ...defaultOptions,
-        ...options,
-        headers: {
-            ...defaultOptions.headers,
-            ...(options.headers || {})
+    // Handle FormData (for file uploads)
+    if (options.body instanceof FormData) {
+        defaultOptions.contentType = false;
+        defaultOptions.processData = false;
+        defaultOptions.data = options.body;
+    } else if (options.body) {
+        // If body is a string (JSON), parse it
+        if (typeof options.body === 'string') {
+            defaultOptions.data = options.body;
+        } else {
+            defaultOptions.data = JSON.stringify(options.body);
         }
-    };
-
-    try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, finalOptions);
-        const data = await response.json();
-        return { response, data };
-    } catch (error) {
-        console.error('API request error:', error);
-        throw error;
     }
+
+    // Merge with provided options
+    const finalOptions = $.extend(true, {}, defaultOptions, {
+        method: options.method || defaultOptions.method,
+        headers: $.extend({}, defaultOptions.headers, options.headers || {})
+    });
+
+    return $.ajax(finalOptions).then(function(data, textStatus, jqXHR) {
+        return {
+            response: {
+                status: jqXHR.status,
+                statusText: jqXHR.statusText,
+                ok: jqXHR.status >= 200 && jqXHR.status < 300
+            },
+            data: data
+        };
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.error('API request error:', errorThrown);
+        // Return error in same format as fetch
+        return {
+            response: {
+                status: jqXHR.status || 500,
+                statusText: jqXHR.statusText || textStatus,
+                ok: false
+            },
+            data: jqXHR.responseJSON || { success: false, message: errorThrown || 'Request failed' }
+        };
+    });
 }
 
 // Logout function
-async function logout() {
-    try {
-        await apiRequest('/logout', {
-            method: 'POST'
-        });
-    } catch (error) {
-        console.error('Logout error:', error);
-    } finally {
+function logout() {
+    return apiRequest('/logout', {
+        method: 'POST'
+    }).always(function() {
         // Remove token from localStorage
         removeAuthToken();
         
         // Redirect to login page - path will be handled by caller
         // This function just clears the token, redirect is handled by the page
-    }
+    });
 }
 
 // Check if user is authenticated
