@@ -374,9 +374,9 @@
     }
 
     // Load user info for navigation
-    async function loadUserInfo() {
-      try {
-        const { response, data } = await apiRequest('/client/user-info');
+    function loadUserInfo() {
+      apiRequest('/client/user-info').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.user) {
           const user = data.user;
           document.getElementById('userName').textContent = `${user.fname} ${user.lname}`;
@@ -395,18 +395,17 @@
           }
           document.getElementById('profilePic').src = profilePicPath;
         }
-      } catch (error) {
-        console.error('Error loading user info:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading user info:', result);
+      });
     }
 
     // Load profile data
-    async function loadProfile() {
-      try {
-        const { response, data } = await apiRequest('/client/profile', {
-          method: 'GET'
-        });
-
+    function loadProfile() {
+      apiRequest('/client/profile', {
+        method: 'GET'
+      }).done(function(result) {
+        const { response, data } = result;
         if (data.success && data.profile) {
           const profile = data.profile;
           
@@ -452,14 +451,14 @@
             });
           }
         }
-      } catch (error) {
-        console.error('Error loading profile:', error);
+      }).fail(function(result) {
+        console.error('Error loading profile:', result);
         Swal.fire({
           title: 'Error!',
           text: 'Failed to load profile. Please try again.',
           icon: 'error'
         });
-      }
+      });
     }
 
     // Profile picture preview
@@ -573,7 +572,7 @@
     }
     
     // Handle form submission
-    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
       const currentPassword = document.getElementById('current_password').value;
@@ -615,31 +614,23 @@
 
       const submitBtn = document.getElementById('save-button');
       const originalText = submitBtn.textContent;
+      const self = this;
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
 
-      try {
-        const token = getAuthToken();
-        const formData = new FormData(this);
-        
-        // Remove readonly fields from form data
-        formData.delete('userid');
-        formData.delete('email');
-        formData.delete('usertype');
+      const formData = new FormData(self);
+      
+      // Remove readonly fields from form data
+      formData.delete('userid');
+      formData.delete('email');
+      formData.delete('usertype');
 
-        // Use fetch directly for FormData (can't use apiRequest as it sets JSON Content-Type)
-        const response = await fetch(`${API_BASE_URL}/client/profile`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
-            // Don't set Content-Type - let browser set it with boundary for FormData
-          },
-          body: formData
-        });
-
-        const data = await response.json();
-
+      // Use apiRequest (jQuery AJAX) for FormData submission
+      apiRequest('/client/profile', {
+        method: 'POST',
+        body: formData
+      }).done(function(result) {
+        const { response, data } = result;
         if (data.success) {
           // Update profile image if new one was uploaded
           if (data.profile && data.profile.profilepic) {
@@ -663,7 +654,7 @@
             text: data.message || 'Profile updated successfully!',
             icon: 'success',
             confirmButtonColor: '#007bff'
-          }).then(() => {
+          }).then(function() {
             // Reload profile to get updated data
             loadProfile();
             loadUserInfo();
@@ -684,32 +675,31 @@
             confirmButtonColor: '#007bff'
           });
         }
-      } catch (error) {
-        console.error('Error updating profile:', error);
+      }).fail(function(result) {
+        console.error('Error updating profile:', result);
         Swal.fire({
           title: 'Error!',
           text: 'An error occurred while updating your profile. Please try again.',
           icon: 'error',
           confirmButtonColor: '#007bff'
         });
-      } finally {
+      }).always(function() {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-      }
+      });
     });
 
     // Logout handlers
-    async function handleLogout() {
-      try {
-        const token = getAuthToken();
-        if (token) {
-          await apiRequest('/logout', {
-            method: 'POST'
-          });
-        }
-      } catch (error) {
-        console.error('Logout error:', error);
-      } finally {
+    function handleLogout() {
+      const token = getAuthToken();
+      if (token) {
+        apiRequest('/logout', {
+          method: 'POST'
+        }).always(function() {
+          removeAuthToken();
+          window.location.href = '../login.html';
+        });
+      } else {
         removeAuthToken();
         window.location.href = '../login.html';
       }
@@ -734,13 +724,13 @@
     }
 
     // Load services for footer
-    async function loadFooterServices() {
-      try {
-        const { response, data } = await apiRequest('/client/services');
+    function loadFooterServices() {
+      apiRequest('/client/services').done(function(result) {
+        const { response, data } = result;
         if (data.success && data.services) {
           const servicesList = document.getElementById('footerServices');
           servicesList.innerHTML = '';
-          data.services.slice(0, 5).forEach(service => {
+          data.services.slice(0, 5).forEach(function(service) {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = `book-service.html?service=${service.servicenum}`;
@@ -749,9 +739,9 @@
             servicesList.appendChild(li);
           });
         }
-      } catch (error) {
-        console.error('Error loading services for footer:', error);
-      }
+      }).fail(function(result) {
+        console.error('Error loading services for footer:', result);
+      });
     }
 
     // Initialize page
