@@ -321,10 +321,9 @@
         let selectedDate = new Date().toISOString().split('T')[0];
 
         document.addEventListener('DOMContentLoaded', function() {
-            const token = getAuthToken();
-            const userType = localStorage.getItem('user_type');
-
-            if (!token || userType !== 'STAFF') {
+            // Authentication check using shared helpers
+            const userInfo = getUserInfo();
+            if (!isAuthenticated() || userInfo.usertype !== 'STAFF') {
                 window.location.href = '../login.html';
                 return;
             }
@@ -356,99 +355,96 @@
                 document.querySelector('.content-wrapper').classList.toggle('expanded');
             });
 
-            // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            // Logout handler using shared logout() helper
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', { method: 'POST' });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                logout().always(function() {
                     removeAuthToken();
                     window.location.href = '../login.html';
-                }
+                });
             });
         });
 
-        // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/staff/user-info');
+        // Load user information (jQuery AJAX style)
+        function loadUserInfo() {
+            apiRequest('/staff/user-info')
+                .done(function(result) {
+                    const { response, data } = result;
 
-                if (data.success && data.user) {
-                    const user = data.user;
-                    const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Staff';
-                    
-                    document.getElementById('staffName').textContent = fullName;
-                    document.getElementById('staffRole').textContent = user.role || 'STAFF';
-                    
-                    let profilePicPath = user.profilepic || 'frontend/staff/profile/default.jpg';
-                    if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
-                        if (!profilePicPath.startsWith('frontend/staff/profile/')) {
-                            if (profilePicPath.startsWith('profile/')) {
-                                profilePicPath = 'frontend/staff/' + profilePicPath;
-                            } else {
-                                profilePicPath = 'frontend/staff/profile/' + profilePicPath;
+                    if (data.success && data.user) {
+                        const user = data.user;
+                        const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Staff';
+                        
+                        document.getElementById('staffName').textContent = fullName;
+                        document.getElementById('staffRole').textContent = user.role || 'STAFF';
+                        
+                        let profilePicPath = user.profilepic || 'frontend/staff/profile/default.jpg';
+                        if (!profilePicPath.startsWith('http://') && !profilePicPath.startsWith('https://')) {
+                            if (!profilePicPath.startsWith('frontend/staff/profile/')) {
+                                if (profilePicPath.startsWith('profile/')) {
+                                    profilePicPath = 'frontend/staff/' + profilePicPath;
+                                } else {
+                                    profilePicPath = 'frontend/staff/profile/' + profilePicPath;
+                                }
                             }
+                            profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
                         }
-                        profilePicPath = `https://jowashlaravel.muccsbblock1.com/jowash-backend/${profilePicPath}`;
+                        document.getElementById('profilePic').src = profilePicPath;
+                    } else {
+                        if (response && (response.status === 401 || response.status === 403)) {
+                            window.location.href = '../login.html';
+                        }
                     }
-                    document.getElementById('profilePic').src = profilePicPath;
-                } else {
-                    if (response && (response.status === 401 || response.status === 403)) {
-                        window.location.href = '../login.html';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-            }
+                })
+                .fail(function(error) {
+                    console.error('Error loading user info:', error);
+                });
         }
 
-        // Load calendar
-        async function loadCalendar() {
-            try {
-                const nextDate = new Date(selectedDate);
-                nextDate.setDate(nextDate.getDate() + 1);
-                const nextDateStr = nextDate.toISOString().split('T')[0];
+        // Load calendar (jQuery AJAX style)
+        function loadCalendar() {
+            const nextDate = new Date(selectedDate);
+            nextDate.setDate(nextDate.getDate() + 1);
+            const nextDateStr = nextDate.toISOString().split('T')[0];
 
-                const { response, data } = await apiRequest(`/staff/calendar?date=${selectedDate}&next_date=${nextDateStr}`);
+            apiRequest(`/staff/calendar?date=${selectedDate}&next_date=${nextDateStr}`)
+                .done(function(result) {
+                    const { data } = result;
 
-                if (data.success) {
-                    // Format dates for display
-                    const selectedDateObj = new Date(selectedDate);
-                    const nextDateObj = new Date(nextDateStr);
-                    
-                    const formattedSelectedDate = selectedDateObj.toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    
-                    const formattedNextDate = nextDateObj.toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
+                    if (data.success) {
+                        // Format dates for display
+                        const selectedDateObj = new Date(selectedDate);
+                        const nextDateObj = new Date(nextDateStr);
+                        
+                        const formattedSelectedDate = selectedDateObj.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        
+                        const formattedNextDate = nextDateObj.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
 
-                    document.getElementById('selectedDateHeading').textContent = formattedSelectedDate;
-                    document.getElementById('nextDateHeading').textContent = formattedNextDate;
+                        document.getElementById('selectedDateHeading').textContent = formattedSelectedDate;
+                        document.getElementById('nextDateHeading').textContent = formattedNextDate;
 
-                    // Render today's bookings
-                    renderBookings(data.bookings, 'todayCalendar');
+                        // Render today's bookings
+                        renderBookings(data.bookings, 'todayCalendar');
 
-                    // Render tomorrow's bookings
-                    renderBookings(data.next_bookings, 'tomorrowCalendar');
-                } else {
-                    console.error('Error loading calendar:', data.message);
-                }
-            } catch (error) {
-                console.error('Error loading calendar:', error);
-            }
+                        // Render tomorrow's bookings
+                        renderBookings(data.next_bookings, 'tomorrowCalendar');
+                    } else {
+                        console.error('Error loading calendar:', data.message);
+                    }
+                })
+                .fail(function(error) {
+                    console.error('Error loading calendar:', error);
+                });
         }
 
         // Render bookings
