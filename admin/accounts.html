@@ -389,16 +389,15 @@
             });
 
             // Logout handler
-            document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
-                try {
-                    const token = getAuthToken();
-                    if (token) {
-                        await apiRequest('/logout', { method: 'POST' });
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
+                const token = getAuthToken();
+                if (token) {
+                    apiRequest('/logout', { method: 'POST' }).always(function() {
+                        removeAuthToken();
+                        window.location.href = '../login.html';
+                    });
+                } else {
                     removeAuthToken();
                     window.location.href = '../login.html';
                 }
@@ -418,13 +417,13 @@
                 toggleAddAccountFields(this.value);
             });
 
-            document.getElementById('submitAddAccount').addEventListener('click', async function() {
-                await handleAddAccount();
+            document.getElementById('submitAddAccount').addEventListener('click', function() {
+                handleAddAccount();
             });
 
             // Edit account form handlers
-            document.getElementById('submitEditAccount').addEventListener('click', async function() {
-                await handleEditAccount();
+            document.getElementById('submitEditAccount').addEventListener('click', function() {
+                handleEditAccount();
             });
 
             // Password toggle handlers
@@ -445,10 +444,9 @@
         });
 
         // Load user information
-        async function loadUserInfo() {
-            try {
-                const { response, data } = await apiRequest('/admin/user-info');
-
+        function loadUserInfo() {
+            apiRequest('/admin/user-info').done(function(result) {
+                const { response, data } = result;
                 if (data.success && data.user) {
                     const user = data.user;
                     const fullName = `${user.fname || ''} ${user.lname || ''}`.trim() || 'Administrator';
@@ -476,31 +474,31 @@
                     document.getElementById('adminName').textContent = 'Administrator';
                     document.getElementById('welcomeName').textContent = 'Administrator';
                 }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                if (error.message && error.message.includes('401')) {
+            }).fail(function(result) {
+                const { response } = result;
+                console.error('Error loading user info:', result);
+                if (response && (response.status === 401 || response.status === 403)) {
                     window.location.href = '../login.html';
                 } else {
                     document.getElementById('adminName').textContent = 'Administrator';
                     document.getElementById('welcomeName').textContent = 'Administrator';
                 }
-            }
+            });
         }
 
         // Load accounts
-        async function loadAccounts() {
-            try {
-                const params = new URLSearchParams({
-                    page: currentPage,
-                    per_page: 8
-                });
-                
-                if (currentSearch) {
-                    params.append('search', currentSearch);
-                }
+        function loadAccounts() {
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 8
+            });
+            
+            if (currentSearch) {
+                params.append('search', currentSearch);
+            }
 
-                const { response, data } = await apiRequest(`/admin/accounts?${params.toString()}`);
-
+            apiRequest(`/admin/accounts?${params.toString()}`).done(function(result) {
+                const { data } = result;
                 if (data.success) {
                     displayAccounts(data.accounts);
                     displayPagination(data.pagination);
@@ -512,11 +510,11 @@
                         text: data.message || 'Failed to load accounts'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading accounts:', error);
+            }).fail(function(result) {
+                console.error('Error loading accounts:', result);
                 document.getElementById('accountsTable').innerHTML = 
                     '<tr><td colspan="5" class="text-center text-danger">Error loading accounts</td></tr>';
-            }
+            });
         }
 
         // Display accounts in table
@@ -679,7 +677,7 @@
         }
 
         // Handle add account
-        async function handleAddAccount() {
+        function handleAddAccount() {
             const form = document.getElementById('addAccountForm');
             
             if (!form.checkValidity()) {
@@ -690,13 +688,12 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            try {
-                const { response, data: result } = await apiRequest('/admin/accounts', {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-
-                if (result.success) {
+            apiRequest('/admin/accounts', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            }).done(function(result) {
+                const { data: resultData } = result;
+                if (resultData.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -710,25 +707,25 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: result.message || 'Failed to create account'
+                        text: resultData.message || 'Failed to create account'
                     });
                 }
-            } catch (error) {
-                console.error('Error adding account:', error);
+            }).fail(function(result) {
+                console.error('Error adding account:', result);
+                const resultData = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to create account'
+                    text: resultData.message || 'Failed to create account'
                 });
-            }
+            });
         }
 
 
         // Edit account
-        async function editAccount(userid) {
-            try {
-                const { response, data } = await apiRequest(`/admin/accounts/${userid}`);
-
+        function editAccount(userid) {
+            apiRequest(`/admin/accounts/${userid}`).done(function(result) {
+                const { data } = result;
                 if (data.success && data.account) {
                     const account = data.account;
                     document.getElementById('editUserid').value = account.userid;
@@ -746,18 +743,19 @@
                         text: data.message || 'Failed to load account details'
                     });
                 }
-            } catch (error) {
-                console.error('Error loading account:', error);
+            }).fail(function(result) {
+                console.error('Error loading account:', result);
+                const data = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to load account details'
+                    text: data.message || 'Failed to load account details'
                 });
-            }
+            });
         }
 
         // Handle edit account
-        async function handleEditAccount() {
+        function handleEditAccount() {
             const form = document.getElementById('editAccountForm');
             
             if (!form.checkValidity()) {
@@ -772,13 +770,12 @@
             // Remove userid from data before sending
             delete data.userid;
 
-            try {
-                const { response, data: result } = await apiRequest(`/admin/accounts/${userid}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(data)
-                });
-
-                if (result.success) {
+            apiRequest(`/admin/accounts/${userid}`, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            }).done(function(result) {
+                const { data: resultData } = result;
+                if (resultData.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -792,22 +789,23 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: result.message || 'Failed to update account'
+                        text: resultData.message || 'Failed to update account'
                     });
                 }
-            } catch (error) {
-                console.error('Error updating account:', error);
+            }).fail(function(result) {
+                console.error('Error updating account:', result);
+                const resultData = result.data || {};
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to update account'
+                    text: resultData.message || 'Failed to update account'
                 });
-            }
+            });
         }
 
         // Delete account
-        async function deleteAccount(userid) {
-            const result = await Swal.fire({
+        function deleteAccount(userid) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
@@ -815,38 +813,38 @@
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, delete it!'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const { response, data } = await apiRequest(`/admin/accounts/${userid}`, {
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    apiRequest(`/admin/accounts/${userid}`, {
                         method: 'DELETE'
-                    });
-
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: 'Account has been deleted successfully'
-                        }).then(() => {
-                            loadAccounts();
-                        });
-                    } else {
+                    }).done(function(response) {
+                        const { data } = response;
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Account has been deleted successfully'
+                            }).then(() => {
+                                loadAccounts();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'Failed to delete account'
+                            });
+                        }
+                    }).fail(function(response) {
+                        console.error('Error deleting account:', response);
+                        const data = response.data || {};
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
                             text: data.message || 'Failed to delete account'
                         });
-                    }
-                } catch (error) {
-                    console.error('Error deleting account:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Failed to delete account'
                     });
                 }
-            }
+            });
         }
 
         // Toggle password visibility
