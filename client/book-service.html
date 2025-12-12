@@ -1197,7 +1197,7 @@
         }
       }).fail(function(result) {
         console.error('Error creating booking:', result);
-        const errorMessage = result.data?.message || 'Error processing booking. Please try again.';
+        const errorMessage = result.data?.message || 'You have requested a booking of same staff, date, and time already. Please try again.';
         const isProfileIncomplete = errorMessage.toLowerCase().includes('profile is incomplete') || 
           errorMessage.toLowerCase().includes('complete your profile');
         
