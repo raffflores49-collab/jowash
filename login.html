@@ -359,7 +359,21 @@
                     });
                 } else {
                     // Handle different error cases
-                    if (data.should_register) {
+                    if (data.requires_activation) {
+                        // Store email for activation page
+                        if (data.email) {
+                            localStorage.setItem('activation_email', data.email);
+                        }
+                        Swal.fire({
+                            title: 'Account Not Verified',
+                            text: data.message,
+                            icon: 'warning',
+                            confirmButtonText: 'Verify Now'
+                        }).then(function() {
+                            // Redirect to activation code page
+                            window.location.href = 'verify-activation.html';
+                        });
+                    } else if (data.should_register) {
                         Swal.fire({
                             title: 'Are you sure?',
                             text: data.message,
@@ -390,11 +404,27 @@
             }).fail(function(jqXHR) {
                 console.error('Login error:', jqXHR);
                 const data = jqXHR.responseJSON || {};
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.message || 'An error occurred. Please try again later.',
-                });
+                
+                // Check if account requires activation (from error response)
+                if (data.requires_activation && data.email) {
+                    // Store email for activation page
+                    localStorage.setItem('activation_email', data.email);
+                    Swal.fire({
+                        title: 'Account Not Verified',
+                        text: data.message || 'Your account is pending activation. Please check your email for the activation code.',
+                        icon: 'warning',
+                        confirmButtonText: 'Verify Now'
+                    }).then(function() {
+                        // Redirect to activation code page
+                        window.location.href = 'verify-activation.html';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'An error occurred. Please try again later.',
+                    });
+                }
             }).always(function() {
                 // Re-enable submit button
                 submitBtn.disabled = false;
