@@ -285,10 +285,19 @@
                 path: 'https://lottie.host/820808c4-6547-4b7d-9daf-6eb4b33d68c3/eSvsQEJUXb.json'
             });
 
-            // Get email from localStorage if available
+            // Get email from URL parameters or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailFromUrl = urlParams.get('email');
             const storedEmail = localStorage.getItem('activation_email');
-            if (storedEmail) {
-                document.getElementById('email').value = storedEmail;
+            
+            // Prefer URL parameter, then localStorage
+            const emailToUse = emailFromUrl || storedEmail;
+            if (emailToUse) {
+                document.getElementById('email').value = emailToUse;
+                // Also store in localStorage for consistency
+                if (!storedEmail && emailFromUrl) {
+                    localStorage.setItem('activation_email', emailFromUrl);
+                }
             }
 
             // Setup code input navigation
