@@ -538,41 +538,99 @@
       // Load user info
       loadUserInfo();
       
-      // Get service ID from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const serviceId = urlParams.get('service');
-      const step = parseInt(urlParams.get('step') || '1');
-      const staffId = urlParams.get('staff');
-      const date = urlParams.get('date');
-      const time = urlParams.get('time');
-      const startDate = urlParams.get('start_date');
-      
-      if (!serviceId) {
-        Swal.fire({
-          title: 'Error!',
-          text: 'Service ID is required',
-          icon: 'error',
-          confirmButtonColor: '#0d6efd'
-        }).then(() => {
-          window.location.href = 'client.html#services';
-        });
-        return;
-      }
-      
-      // Load service details
-      loadService(serviceId).done(function() {
-        // Load appropriate step based on URL
-        if (step === 1) {
-          showStep1(serviceId);
-        } else if (step === 2 && staffId) {
-          // Use start_date from URL if provided, otherwise use current date
-          const dateToUse = startDate || date || new Date().toISOString().split('T')[0];
-          showStep2(serviceId, staffId, date, dateToUse);
-        } else if (step === 3 && staffId && date && time) {
-          showStep3(serviceId, staffId, date, time);
-        } else {
-          showStep1(serviceId);
+      // Check profile completeness first
+      checkProfileComplete().done(function(result) {
+        const isComplete = result._isComplete === true;
+        if (!isComplete) {
+          Swal.fire({
+            title: 'Profile Incomplete!',
+            text: 'Your profile is incomplete. Please complete your profile before booking a service.',
+            icon: 'warning',
+            confirmButtonColor: '#0d6efd',
+            showCancelButton: true,
+            confirmButtonText: 'Go to Edit Profile',
+            cancelButtonText: 'Go Back'
+          }).then(function(result) {
+            if (result.isConfirmed) {
+              window.location.href = 'edit-profile.html';
+            } else {
+              window.location.href = 'client.html#services';
+            }
+          });
+          return;
         }
+        
+        // Profile is complete, proceed with booking
+        // Get service ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get('service');
+        const step = parseInt(urlParams.get('step') || '1');
+        const staffId = urlParams.get('staff');
+        const date = urlParams.get('date');
+        const time = urlParams.get('time');
+        const startDate = urlParams.get('start_date');
+        
+        if (!serviceId) {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Service ID is required',
+            icon: 'error',
+            confirmButtonColor: '#0d6efd'
+          }).then(() => {
+            window.location.href = 'client.html#services';
+          });
+          return;
+        }
+        
+        // Load service details
+        loadService(serviceId).done(function() {
+          // Load appropriate step based on URL
+          if (step === 1) {
+            showStep1(serviceId);
+          } else if (step === 2 && staffId) {
+            // Use start_date from URL if provided, otherwise use current date
+            const dateToUse = startDate || date || new Date().toISOString().split('T')[0];
+            showStep2(serviceId, staffId, date, dateToUse);
+          } else if (step === 3 && staffId && date && time) {
+            showStep3(serviceId, staffId, date, time);
+          } else {
+            showStep1(serviceId);
+          }
+        });
+      }).fail(function() {
+        // If profile check fails, still allow booking (backend will catch it)
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get('service');
+        const step = parseInt(urlParams.get('step') || '1');
+        const staffId = urlParams.get('staff');
+        const date = urlParams.get('date');
+        const time = urlParams.get('time');
+        const startDate = urlParams.get('start_date');
+        
+        if (!serviceId) {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Service ID is required',
+            icon: 'error',
+            confirmButtonColor: '#0d6efd'
+          }).then(() => {
+            window.location.href = 'client.html#services';
+          });
+          return;
+        }
+        
+        loadService(serviceId).done(function() {
+          if (step === 1) {
+            showStep1(serviceId);
+          } else if (step === 2 && staffId) {
+            const dateToUse = startDate || date || new Date().toISOString().split('T')[0];
+            showStep2(serviceId, staffId, date, dateToUse);
+          } else if (step === 3 && staffId && date && time) {
+            showStep3(serviceId, staffId, date, time);
+          } else {
+            showStep1(serviceId);
+          }
+        });
       });
     });
 
@@ -588,6 +646,28 @@
     let bookedSlots = {};
     let availableDates = [];
     let dateNavigation = {};
+
+    // Check if profile is complete
+    function checkProfileComplete() {
+      return apiRequest('/client/profile').done(function(result) {
+        const { response, data } = result;
+        let isComplete = false;
+        if (data.success && data.profile) {
+          const profile = data.profile;
+          // Check if all required fields are filled
+          if (profile.fname && profile.lname && profile.birthdate && 
+              profile.contact && profile.street && profile.barangay && 
+              profile.city && profile.province && profile.country && 
+              profile.postalcode) {
+            isComplete = true; // Profile complete
+          }
+        }
+        result._isComplete = isComplete;
+      }).fail(function(result) {
+        console.error('Error checking profile:', result);
+        result._isComplete = false;
+      });
+    }
 
     // Load user information
     function loadUserInfo() {
@@ -1087,21 +1167,62 @@
             window.location.href = 'my-bookings.html';
           });
         } else {
+          // Check if error is about incomplete profile
+          const isProfileIncomplete = data.message && 
+            (data.message.toLowerCase().includes('profile is incomplete') || 
+             data.message.toLowerCase().includes('complete your profile'));
+          
+          if (isProfileIncomplete) {
+            Swal.fire({
+              title: 'Profile Incomplete!',
+              text: data.message || 'Your profile is incomplete. Please complete your profile before booking a service.',
+              icon: 'warning',
+              confirmButtonColor: '#0d6efd',
+              showCancelButton: true,
+              confirmButtonText: 'Go to Edit Profile',
+              cancelButtonText: 'Cancel'
+            }).then(function(result) {
+              if (result.isConfirmed) {
+                window.location.href = 'edit-profile.html';
+              }
+            });
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message || 'Failed to create booking',
+              icon: 'error',
+              confirmButtonColor: '#0d6efd'
+            });
+          }
+        }
+      }).fail(function(result) {
+        console.error('Error creating booking:', result);
+        const errorMessage = result.data?.message || 'Error processing booking. Please try again.';
+        const isProfileIncomplete = errorMessage.toLowerCase().includes('profile is incomplete') || 
+          errorMessage.toLowerCase().includes('complete your profile');
+        
+        if (isProfileIncomplete) {
+          Swal.fire({
+            title: 'Profile Incomplete!',
+            text: errorMessage,
+            icon: 'warning',
+            confirmButtonColor: '#0d6efd',
+            showCancelButton: true,
+            confirmButtonText: 'Go to Edit Profile',
+            cancelButtonText: 'Cancel'
+          }).then(function(result) {
+            if (result.isConfirmed) {
+              window.location.href = 'edit-profile.html';
+            }
+          });
+        } else {
           Swal.fire({
             title: 'Error!',
-            text: data.message || 'Failed to create booking',
+            text: errorMessage,
             icon: 'error',
             confirmButtonColor: '#0d6efd'
           });
         }
-      }).fail(function(result) {
-        console.error('Error creating booking:', result);
-        Swal.fire({
-          title: 'Error!',
-          text: result.data?.message || 'Error processing booking. You have pending booking for the same staff at the same time.',
-          icon: 'error',
-          confirmButtonColor: '#0d6efd'
-        });
       });
     }
 
